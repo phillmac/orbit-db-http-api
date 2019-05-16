@@ -164,7 +164,7 @@ class OrbitdbAPI extends Express {
 
 
         var rawall = async (req, res, next) => {
-            let db, result, contents
+            let db
             db = await dbm.get(req.params.dbname)
             if (typeof db._query == 'function') {
                 return db._query({limit:-1})
