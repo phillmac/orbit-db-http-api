@@ -9,12 +9,26 @@ class OrbitdbAPI {
     constructor (dbm, server_opts) {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
         let dbMiddleware;
+        this.debug = false;
 
         listener = Http2.createSecureServer(server_opts.http2_opts);
         this.server = new Hapi.Server({
             listener,
             tls: true,
-            port: server_opts.api_port});
+            port: server_opts.api_port
+        });
+
+        this.server.ext('onPreResponse', (request, h) => {
+            let response = request.response;
+            if (!response.isBoom) {
+                return h.continue;
+            }
+            console.error(response)
+            if (this.debug) {
+                response.output.payload.message = String(response)
+            }
+            return response
+        });
 
         comparisons = {
             'ne': (a, b) => a != b,
