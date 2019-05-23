@@ -8,7 +8,7 @@ const Susie = require('susie');
 class OrbitdbAPI {
     constructor (dbm, server_opts) {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
-        let dbMiddleware, ErrorHandler, asyncMiddleware;
+        let dbMiddleware;
 
         listener = Http2.createSecureServer(server_opts.http2_opts);
         this.server = new Hapi.Server({
@@ -33,16 +33,7 @@ class OrbitdbAPI {
                 let db
                 db = await dbm.get(request.params.dbname)
                 return Promise.resolve((fn(db, request, h)))
-                    .catch((err) => ErrorHandler(err, h));
-        };
-
-        asyncMiddleware = fn =>
-            (request, h) => Promise.resolve(fn(request, h))
-                .catch((err) => ErrorHandler(err, h));
-
-        ErrorHandler = (err, _h) => {
-            console.error(err);
-            return Boom.badImplementation();
+                    .catch((err) => {throw err});
         };
 
         rawiterator = (db, request, _h) =>
@@ -70,56 +61,44 @@ class OrbitdbAPI {
             {
                 method: 'GET',
                 path: '/dbs',
-                handler: (_request, h) => {
-                    try {
-                        return dbm.db_list();
-                    } catch(err) {
-                        return ErrorHandler(err, h);
-                    }
-                }
+                handler: (_request, h) => dbm.db_list()
             },
             {
                 method: ['POST', 'PUT'],
                 path: '/db',
-                handler: asyncMiddleware( async (request, _h) => {
+                handler: async (request, _h) => {
                     let db, payload;
                     payload = request.payload;
                     db = await dbm.get(payload.dbname, payload);
                     return dbm.db_info(db.dbname);
-                })
+                }
             },
             {
                 method: ['POST', 'PUT'],
                 path: '/db/{dbname}',
-                handler: asyncMiddleware( async (request, _h) => {
+                handler: async (request, _h) => {
                     let db;
                     db = await dbm.get(request.params.dbname, request.payload);
                     return dbm.db_info(db.dbname);
-                })
+                }
             },
             {
                 method: 'GET',
                 path: '/db/{dbname}',
-                handler: (request, h) => {
-                    try {
-                       return dbm.db_info(request.params.dbname);
-                    } catch(err) {
-                        return ErrorHandler(err, h);
-                    }
-                }
+                handler: (request, _h) => dbm.db_info(request.params.dbname)
             },
             {
                 method: 'DELETE',
                 path: '/db/{dbname}',
-                handler: asyncMiddleware( async (request, _h) => {
+                handler: async (request, _h) => {
                     await dbm.db_list_remove(request.params.dbname);
                     return {};
-                })
+                }
             },
             {
                 method: 'DELETE',
                 path: '/db/{dbname}/{item}',
-                handler: dbMiddleware( async (db, request, _h) => {
+                handler: async (db, request, _h) => {
                     if (db.del) {
                         return {hash: await db.del(request.params.item)};
                     } else if (db.remove) {
@@ -131,7 +110,7 @@ class OrbitdbAPI {
                             dbtype: db.type
                         });
                     }
-                })
+                }
             },
             {
                 method: ['POST', 'PUT'],
@@ -244,13 +223,7 @@ class OrbitdbAPI {
            {
                 method: 'GET',
                 path: '/identity',
-                handler: (_request, h) => {
-                    try {
-                        return dbm.identity()
-                    } catch(err) {
-                        return ErrorHandler(err, h);
-                    }
-                }
+                handler: (_request, _h) => dbm.identity()
             },
             {
                 method: ['POST', 'PUT'],
