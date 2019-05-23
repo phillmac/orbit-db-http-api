@@ -252,35 +252,32 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
                     let eventname = request.params.eventname
-                    switch (eventname) {
-                        case 'replicated':
-                            db.events.on('replicated', (address) =>
-                                h.event({event:'replicated', data: {address:address}}));
-                            break;
-                        case 'replicate.progress':
-                            db.events.on('replicate.progress', (address, hash, entry, progress, have) =>
-                                h.event({event:'replicate.progress', data: {address:address, hash:hash, entry:entry, progress:progress, have:have}}));
-                            break;
-                        case 'load':
-                            db.events.on('load', (dbname) => h.event({event:'load', data: {dbname:dbname}}));
-                            break;
-                        case 'load.progress':
-                            db.events.on('load.progress', (address, hash, entry, progress, total) =>
-                                h.event({event:'load.progress', data: {address:address, hash:hash, entry:entry, progress:progress, total:total}}));
-                            break;
-                        case 'ready':
-                            db.events.on('ready', (dbname, heads) => h.event({event:'ready', data: {dbname:dbname, heads:heads}}));
-                            break;
-                        case 'write':
-                            db.events.on('write', (dbname, hash, entry) => h.event({event:'write', data: {dbname:dbname, hash:hash, entry:entry}}));
-                            break;
-                        case 'closed':
-                            db.events.on('closed', (dbname) => h.event({event:'closed', data: {dbname:dbname}}));
-                            break;
-                    }
-                    setInterval(() => h.event({type:'keep-alive'}), 10000)
 
-                    return h.event({event:'registered', data: {eventname:eventname}})
+                    event_map = {
+                        'replicated': (address) =>
+                            h.event({event:'replicated', data: {address:address}}),
+                        'replicate.progress': (address, hash, entry, progress, have) =>
+                            h.event({event:'replicate.progress', data: {address:address, hash:hash, entry:entry, progress:progress, have:have}}),
+                        'load': (dbname) =>
+                            h.event({event:'load', data: {dbname:dbname}}),
+                        'load.progress': (address, hash, entry, progress, total) =>
+                            h.event({event:'load.progress', data: {address:address, hash:hash, entry:entry, progress:progress, total:total}}),
+                        'ready': (dbname, heads) =>
+                            h.event({event:'ready', data: {dbname:dbname, heads:heads}}),
+                        'write': (dbname, hash, entry) =>
+                                h.event({event:'write', data: {dbname:dbname, hash:hash, entry:entry}}),
+                        'closed': (dbname) =>
+                                h.event({event:'closed', data: {dbname:dbname}})
+                    }
+
+                    event_callback = event_map.get(eventname)
+                    if(event_callback){
+                        db.events.on(eventname, event_callback)
+                        request.events.on('disconnect', () => db.events.removeListener(eventname, event_callback))
+                        setInterval(() => h.event({event:'keep-alive'}), 10000)
+                        return h.event({event:'registered', data: {eventname:eventname}})
+                    }
+                    return Boom.badRequest('Unrecognized event name')
                 })
             }
         ]);
