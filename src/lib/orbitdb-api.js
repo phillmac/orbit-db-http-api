@@ -65,7 +65,7 @@ class OrbitdbAPI {
             return contents
         };
 
-        Promise.resolve( this.server.register(Underdog)).catch((err) => {throw err});
+        Promise.resolve(this.server.register(Underdog)).catch((err) => {throw err});
         this.server.route([
             {
                 method: 'GET',
