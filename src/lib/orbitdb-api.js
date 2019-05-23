@@ -253,7 +253,7 @@ class OrbitdbAPI {
                 handler: dbMiddleware( async (db, request, h) => {
                     let eventname = request.params.eventname
 
-                    let event_map = {
+                    let event_map = Map(Object.entries({
                         'replicated': (address) =>
                             h.event({event:'replicated', data: {address:address}}),
                         'replicate.progress': (address, hash, entry, progress, have) =>
@@ -268,7 +268,7 @@ class OrbitdbAPI {
                                 h.event({event:'write', data: {dbname:dbname, hash:hash, entry:entry}}),
                         'closed': (dbname) =>
                                 h.event({event:'closed', data: {dbname:dbname}})
-                    }
+                    }));
 
                     event_callback = event_map.get(eventname)
                     if(event_callback){
