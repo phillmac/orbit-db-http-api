@@ -265,6 +265,7 @@ class OrbitdbAPI {
                 handler: dbMiddleware( async (db, request, h) => {
                     if (! h.pushAllowed()) return Boom.badRequest('HTTP/2 push disallowed in request')
                     db.events.on(request.params.eventname, (event)=> h.push(event))
+                    h.continue()
                 })
             }
         ]);
