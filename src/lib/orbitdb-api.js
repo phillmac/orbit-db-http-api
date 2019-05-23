@@ -113,9 +113,6 @@ class OrbitdbAPI {
                 method: 'DELETE',
                 path: '/db/{dbname}/{item}',
                 handler: dbMiddleware (async (db, request, _h) => {
-                    let item = request.params.item;
-                    console.log(`Removing ${item} from ${request.params.dbname}`)
-                    console.log(db)
                     if (db.del) {
                         return {hash: await db.del(request.params.item)};
                     } else if (db.remove) {
