@@ -263,8 +263,12 @@ class OrbitdbAPI {
                 method: 'GET',
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
-                    //if (! h.pushAllowed()) return Boom.badRequest('HTTP/2 push disallowed in request')
-                    db.events.on(request.params.eventname, () => h.event(arguments))
+                    eventname = request.params.eventname
+                    switch (eventname) {
+                        case 'write':
+                            db.events.on('write', (dbname, hash, entry) => h.event({dbname:dbname, hash:hash, entry:entry}));
+                            break;
+                    }
                     return h.event({evt:'registered'})
                 })
             }
