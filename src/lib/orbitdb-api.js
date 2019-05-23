@@ -1,7 +1,7 @@
 const Hapi  = require('hapi');
 const Boom  = require('boom');
 const Http2 = require('http2');
-const Underdog = require('underdog');
+const Susie = require('susie');
 
 
 
@@ -65,7 +65,7 @@ class OrbitdbAPI {
             return contents
         };
 
-        Promise.resolve(this.server.register(Underdog)).catch((err) => {throw err});
+        Promise.resolve(this.server.register(Susie)).catch((err) => {throw err});
         this.server.route([
             {
                 method: 'GET',
@@ -264,8 +264,8 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
                     if (! h.pushAllowed()) return Boom.badRequest('HTTP/2 push disallowed in request')
-                    db.events.on(request.params.eventname, (event)=> h.push(event))
-                    h.continue()
+                    db.events.on(request.params.eventname, (event)=> h.event(event))
+                    return h.event({evt:'registered'})
                 })
             }
         ]);
