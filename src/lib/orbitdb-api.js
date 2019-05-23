@@ -223,6 +223,7 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/all',
                 handler: dbMiddleware( async (db, _request, _h) => {
                     if (typeof db._query == 'function') {
+                        let contents
                         contents = db._query({limit:-1})
                        return contents.map((e) => Object.keys(e.payload.value)[0])
                     } else {
