@@ -1,6 +1,8 @@
 const Hapi  = require('hapi');
 const Boom  = require('boom');
 const Http2 = require('http2');
+const Underdog = require('underdog');
+
 
 
 class OrbitdbAPI {
@@ -63,6 +65,7 @@ class OrbitdbAPI {
             return contents
         };
 
+        await this.server.register(Underdog);
         this.server.route([
             {
                 method: 'GET',
