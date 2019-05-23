@@ -268,32 +268,32 @@ class OrbitdbAPI {
                     switch (eventname) {
                         case 'replicated':
                             db.events.on('replicated', (address) =>
-                                h.event({type:'replicated',address:address}));
+                                h.event({event:'replicated', data: {address:address}}));
                             break;
                         case 'replicate.progress':
                             db.events.on('replicate.progress', (address, hash, entry, progress, have) =>
-                                h.event({type:'replicate.progress',address:address, hash:hash, entry:entry, progress:progress, have:have}));
+                                h.event({event:'replicate.progress', data: {address:address, hash:hash, entry:entry, progress:progress, have:have}}));
                             break;
                         case 'load':
-                            db.events.on('load', (dbname) => h.event({type:'load', dbname:dbname}));
+                            db.events.on('load', (dbname) => h.event({event:'load', data: {dbname:dbname}}));
                             break;
                         case 'load.progress':
                             db.events.on('load.progress', (address, hash, entry, progress, total) =>
-                                h.event({type:'load.progress',address:address, hash:hash, entry:entry, progress:progress, total:total}));
+                                h.event({event:'load.progress', data: {address:address, hash:hash, entry:entry, progress:progress, total:total}}));
                             break;
                         case 'ready':
-                            db.events.on('ready', (dbname, heads) => h.event({type:'ready',dbname:dbname, heads:heads}));
+                            db.events.on('ready', (dbname, heads) => h.event({event:'ready', data: {dbname:dbname, heads:heads}}));
                             break;
                         case 'write':
-                            db.events.on('write', (dbname, hash, entry) => h.event({type:'write',dbname:dbname, hash:hash, entry:entry}));
+                            db.events.on('write', (dbname, hash, entry) => h.event({event:'write', data: {dbname:dbname, hash:hash, entry:entry}}));
                             break;
                         case 'closed':
-                            db.events.on('closed', (dbname) => h.event({type:'closed', dbname:dbname}));
+                            db.events.on('closed', (dbname) => h.event({event:'closed', data: {dbname:dbname}}));
                             break;
                     }
                     setInterval(() => h.event({type:'keep-alive'}), 10000)
 
-                    return h.event({type:'registered', eventname:eventname})
+                    return h.event({event:'registered', data: {eventname:eventname}})
                 })
             }
         ]);
