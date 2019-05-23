@@ -1,6 +1,8 @@
 const Hapi  = require('hapi');
 const Boom  = require('boom');
 const Http2 = require('http2');
+const Susie = require('susie');
+
 
 
 class OrbitdbAPI {
@@ -54,6 +56,7 @@ class OrbitdbAPI {
             return contents
         };
 
+        Promise.resolve(this.server.register(Susie)).catch((err) => {throw err});
         this.server.route([
             {
                 method: 'GET',
@@ -228,6 +231,42 @@ class OrbitdbAPI {
                 handler: dbMiddleware( async (db, request, _h) => {
                     await db.access.grant('write', request.payload.publicKey)
                     return {};
+                })
+            },
+            {
+                method: 'GET',
+                path: '/db/{dbname}/events/{eventname}',
+                handler: dbMiddleware( async (db, request, h) => {
+                    let eventname = request.params.eventname
+                    switch (eventname) {
+                        case 'replicated':
+                            db.events.on('replicated', (address) =>
+                                h.event({type:'replicated',address:address}));
+                            break;
+                        case 'replicate.progress':
+                            db.events.on('replicate.progress', (address, hash, entry, progress, have) =>
+                                h.event({type:'replicate.progress',address:address, hash:hash, entry:entry, progress:progress, have:have}));
+                            break;
+                        case 'load':
+                            db.events.on('load', (dbname) => h.event({type:'load', dbname:dbname}));
+                            break;
+                        case 'load.progress':
+                            db.events.on('load.progress', (address, hash, entry, progress, total) =>
+                                h.event({type:'load.progress',address:address, hash:hash, entry:entry, progress:progress, total:total}));
+                            break;
+                        case 'ready':
+                            db.events.on('ready', (dbname, heads) => h.event({type:'ready',dbname:dbname, heads:heads}));
+                            break;
+                        case 'write':
+                            db.events.on('write', (dbname, hash, entry) => h.event({type:'write',dbname:dbname, hash:hash, entry:entry}));
+                            break;
+                        case 'closed':
+                            db.events.on('closed', (dbname) => h.event({type:'closed', dbname:dbname}));
+                            break;
+                    }
+                    setInterval(() => h.event({type:'keep-alive'}), 10000)
+
+                    return h.event({type:'registered', eventname:eventname})
                 })
             }
         ]);

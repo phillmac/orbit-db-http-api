@@ -28,7 +28,8 @@
     "dependencies": {
       "docopt": "~0.6.2",
       "hapi": ">17.0.0",
-      "http2":"^3.2.0",
+      "http2": "^3.2.0",
+      "susie": ">=3.0.0",
       "ipfs": "^0.35.0",
       "ipfs-http-client": "^30.0.0",
       "orbit-db": "^0.20.0"
