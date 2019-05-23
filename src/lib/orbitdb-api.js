@@ -6,7 +6,7 @@ const Underdog = require('underdog');
 
 
 class OrbitdbAPI {
-    constructor (dbm, server_opts) {
+    async constructor (dbm, server_opts) {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
         let dbMiddleware, ErrorHandler, asyncMiddleware;
 

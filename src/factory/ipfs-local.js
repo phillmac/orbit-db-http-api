@@ -31,7 +31,7 @@ async function api_factory(ipfs_opts, orbitdb_dir, orbitdb_opts, server_opts) {
       }).catch((ex) => {throw ex})
     orbitdb     = await OrbitDB.createInstance(ipfs, orbitdb_opts)
     dbm         = new DBManager(orbitdb)
-    orbitdb_api = new OrbitApi(dbm, server_opts)
+    orbitdb_api = await new OrbitApi(dbm, server_opts)
 
     return orbitdb_api
 }
