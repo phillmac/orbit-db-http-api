@@ -6,7 +6,7 @@ const Underdog = require('underdog');
 
 
 class OrbitdbAPI {
-    async constructor (dbm, server_opts) {
+    constructor (dbm, server_opts) {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
         let dbMiddleware, ErrorHandler, asyncMiddleware;
 
@@ -65,7 +65,7 @@ class OrbitdbAPI {
             return contents
         };
 
-        await this.server.register(Underdog);
+        Promise.resolve( this.server.register(Underdog)).catch((err) => {throw err});
         this.server.route([
             {
                 method: 'GET',
