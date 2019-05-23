@@ -239,7 +239,7 @@ class OrbitdbAPI {
                 handler: dbMiddleware( async (db, request, h) => {
                     let eventname = request.params.eventname
 
-                    event_map = {
+                    let event_map = {
                         'replicated': (address) =>
                             h.event({event:'replicated', data: {address:address}}),
                         'replicate.progress': (address, hash, entry, progress, have) =>
