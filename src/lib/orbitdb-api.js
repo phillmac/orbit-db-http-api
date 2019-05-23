@@ -75,7 +75,7 @@ class OrbitdbAPI {
             {
                 method: 'GET',
                 path: '/dbs',
-                handler: (_request, h) => dbm.db_list()
+                handler: (_request, _h) => dbm.db_list()
             },
             {
                 method: ['POST', 'PUT'],
@@ -112,7 +112,7 @@ class OrbitdbAPI {
             {
                 method: 'DELETE',
                 path: '/db/{dbname}/{item}',
-                handler: async (db, request, _h) => {
+                handler: dbMiddleware (async (db, request, _h) => {
                     let item = request.params.item;
                     console.log(`Removing ${item} from ${request.params.dbname}`)
                     console.log(db)
@@ -127,7 +127,7 @@ class OrbitdbAPI {
                             dbtype: db.type
                         });
                     }
-                }
+                })
             },
             {
                 method: ['POST', 'PUT'],
