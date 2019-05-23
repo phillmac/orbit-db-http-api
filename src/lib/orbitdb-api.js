@@ -270,7 +270,7 @@ class OrbitdbAPI {
                                 h.event({event:'closed', data: {dbname:dbname}})
                     }));
 
-                    event_callback = event_map.get(eventname)
+                    let event_callback = event_map.get(eventname)
                     if(event_callback){
                         db.events.on(eventname, event_callback)
                         request.events.on('disconnect', () => db.events.removeListener(eventname, event_callback))
