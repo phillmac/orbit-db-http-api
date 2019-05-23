@@ -290,7 +290,7 @@ class OrbitdbAPI {
                             db.events.on('closed', (dbname) => h.event({type:'closed', dbname:dbname}));
                             break;
                     }
-                    setInterval(h.event({type:'keep-alive'}, 10000))
+                    setInterval(h.event({type:'keep-alive'}), 10000)
 
                     return h.event({type:'registered', eventname:eventname})
                 })
