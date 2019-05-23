@@ -265,11 +265,34 @@ class OrbitdbAPI {
                 handler: dbMiddleware( async (db, request, h) => {
                     let eventname = request.params.eventname
                     switch (eventname) {
+                        case 'replicated':
+                            db.events.on('replicated', (address) =>
+                                h.event({type:'replicated',address:address}));
+                            break;
+                        case 'replicate.progress':
+                            db.events.on('replicate.progress', (address, hash, entry, progress, have) =>
+                                h.event({type:'replicate.progress',address:address, hash:hash, entry:entry, progress:progress, have:have}));
+                            break;
+                        case 'load':
+                            db.events.on('load', (dbname) => h.event({type:'load', dbname:dbname}));
+                            break;
+                        case 'load.progress':
+                            db.events.on('load.progress', (address, hash, entry, progress, total) =>
+                                h.event({type:'load.progress',address:address, hash:hash, entry:entry, progress:progress, total:total}));
+                            break;
+                        case 'ready':
+                            db.events.on('ready', (dbname, heads) => h.event({type:'ready',dbname:dbname, heads:heads}));
+                            break;
                         case 'write':
-                            db.events.on('write', (dbname, hash, entry) => h.event({dbname:dbname, hash:hash, entry:entry}));
+                            db.events.on('write', (dbname, hash, entry) => h.event({type:'write',dbname:dbname, hash:hash, entry:entry}));
+                            break;
+                        case 'closed':
+                            db.events.on('closed', (dbname) => h.event({type:'closed', dbname:dbname}));
                             break;
                     }
-                    return h.event({evt:'registered'})
+                    setInterval(h.event({type:'keep-alive'}, 10000))
+
+                    return h.event({type:'registered', eventname:eventname})
                 })
             }
         ]);
