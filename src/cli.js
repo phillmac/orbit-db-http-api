@@ -21,8 +21,6 @@ Options:
     --api-port=API_PORT             Listen for api calls on API_PORT
     --orbitdb-dir=ORBITDB_DIR       Store orbit-db files in ORBITDB_DIR
     --orbitdb-conf=ORBITDB_CONF     Load orbit-db conf options from ORBITDB_CONF
-    --https-cert=HTTPS_CERT         Path to https cert
-    --https-key=HTTPS_KEY           Path to https cert key
 
 
 `;
@@ -52,20 +50,11 @@ async function init () {
         }
 
         api_port = args['--api-port'] || process.env.API_PORT || 3000
-        let cert, cert_key, server_opts
-
-        cert = args['--https-cert'] || process.env.HTTPS_CERT
-        cert_key = args['--https-key'] || process.env.HTTPS_KEY
-
-        if (!cert) throw new Error('--https-cert is required');
-        if (!cert_key) throw new Error('--https-key is required');
+        let server_opts
 
         server_opts = {
             api_port: api_port,
-            http2_opts: {
-                key: fs.readFileSync(cert_key),
-                cert: fs.readFileSync(cert)
-            }
+            http2_opts: {}
         }
 
         switch(true){

@@ -10,7 +10,7 @@ class OrbitdbAPI {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
         let dbMiddleware;
 
-        listener = Http2.createSecureServer(server_opts.http2_opts);
+        listener = Http2.createServer(server_opts.http2_opts);
         this.server = new Hapi.Server({
             listener,
             tls: true,
