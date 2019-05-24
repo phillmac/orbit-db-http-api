@@ -36,7 +36,7 @@
 To install the OrbitDB HTTP Client:
 
 ```shell
-git clone https://github.com/phillmac/orbit-db-api.git
+git clone https://github.com/orbitdb/orbit-db-http-api.git
 cd orbit-db-api
 npm install
 ```
