@@ -53,6 +53,7 @@ async function init () {
         api_port = args['--api-port'] || process.env.API_PORT || 3000
         let server_opts, http2_opts
 
+        http2_opts = {}
         if (args['--http1-enable']) {
             http2_opts['allowHTTP1'] = true;
             console.log('HTTP1 enabled')
