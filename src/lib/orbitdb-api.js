@@ -3,7 +3,7 @@ const Boom  = require('boom');
 const Http2 = require('http2');
 const Susie = require('susie');
 
-
+require('events').EventEmitter.defaultMaxListeners = 50  //Set warning higher then normal to handle many clients
 
 class OrbitdbAPI {
     constructor (dbm, server_opts) {
