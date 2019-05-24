@@ -21,6 +21,7 @@ Options:
     --api-port=API_PORT             Listen for api calls on API_PORT
     --orbitdb-dir=ORBITDB_DIR       Store orbit-db files in ORBITDB_DIR
     --orbitdb-conf=ORBITDB_CONF     Load orbit-db conf options from ORBITDB_CONF
+    --http1-enable                  Enable HTTP1.X connections
 
 
 `;
@@ -50,11 +51,16 @@ async function init () {
         }
 
         api_port = args['--api-port'] || process.env.API_PORT || 3000
-        let server_opts
+        let server_opts, http2_opts
+
+        if (args['--http1-enable']) {
+            http2_opts[allowHTTP1] = true;
+            console.log('HTTP1 enabled')
+        }
 
         server_opts = {
             api_port: api_port,
-            http2_opts: {}
+            http2_opts: http2_opts
         }
 
         switch(true){
