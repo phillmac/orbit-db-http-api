@@ -54,7 +54,7 @@ async function init () {
         let server_opts, http2_opts
 
         if (args['--http1-enable']) {
-            http2_opts[allowHTTP1] = true;
+            http2_opts['allowHTTP1'] = true;
             console.log('HTTP1 enabled')
         }
 
