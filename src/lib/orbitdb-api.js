@@ -8,7 +8,7 @@ require('events').EventEmitter.defaultMaxListeners = 50  //Set warning higher th
 class OrbitdbAPI {
     constructor (dbm, server_opts) {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
-        let dbMiddleware;
+        let dbMiddleware, addEventListener;
 
         listener = Http2.createSecureServer(server_opts.http2_opts);
         this.server = new Hapi.Server({
@@ -55,6 +55,37 @@ class OrbitdbAPI {
             }
             return contents
         };
+
+        addEventListener = (db, event_name, h) => {
+            let event_map = new Map(Object.entries({
+                'replicated': (address) =>
+                    h.event({event:'replicated', data: {address:address}}),
+                'replicate.progress': (address, hash, entry, progress, have) =>
+                    h.event({event:'replicate.progress', data: {address:address, hash:hash, entry:entry, progress:progress, have:have}}),
+                'load': (dbname) =>
+                    h.event({event:'load', data: {dbname:dbname}}),
+                'load.progress': (address, hash, entry, progress, total) =>
+                    h.event({event:'load.progress', data: {address:address, hash:hash, entry:entry, progress:progress, total:total}}),
+                'ready': (dbname, heads) =>
+                    h.event({event:'ready', data: {dbname:dbname, heads:heads}}),
+                'write': (dbname, hash, entry) =>
+                        h.event({event:'write', data: {dbname:dbname, hash:hash, entry:entry}}),
+                'closed': (dbname) =>
+                        h.event({event:'closed', data: {dbname:dbname}})
+            }));
+
+            let event_callback = event_map.get(event_name)
+            if(event_callback){
+                db.events.on(event_name, event_callback)
+                keepalive = setInterval(() => h.event({event:'keep-alive'}), 10000)
+                request.events.on('disconnect', () => {
+                    db.events.removeListener(event_name, event_callback)
+                    clearInterval(keepalive)
+                })
+                return h.event({event:'registered', data: {eventname:event_name}})
+            }
+            return Boom.badRequest('Unrecognized event name')
+        }
 
         Promise.resolve(this.server.register(Susie)).catch((err) => {throw err});
         this.server.route([
@@ -237,35 +268,11 @@ class OrbitdbAPI {
                 method: 'GET',
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
-                    let eventname = request.params.eventname
-
-                    let event_map = new Map(Object.entries({
-                        'replicated': (address) =>
-                            h.event({event:'replicated', data: {address:address}}),
-                        'replicate.progress': (address, hash, entry, progress, have) =>
-                            h.event({event:'replicate.progress', data: {address:address, hash:hash, entry:entry, progress:progress, have:have}}),
-                        'load': (dbname) =>
-                            h.event({event:'load', data: {dbname:dbname}}),
-                        'load.progress': (address, hash, entry, progress, total) =>
-                            h.event({event:'load.progress', data: {address:address, hash:hash, entry:entry, progress:progress, total:total}}),
-                        'ready': (dbname, heads) =>
-                            h.event({event:'ready', data: {dbname:dbname, heads:heads}}),
-                        'write': (dbname, hash, entry) =>
-                                h.event({event:'write', data: {dbname:dbname, hash:hash, entry:entry}}),
-                        'closed': (dbname) =>
-                                h.event({event:'closed', data: {dbname:dbname}})
-                    }));
-
-                    let event_callback = event_map.get(eventname)
-                    if(event_callback){
-                        db.events.on(eventname, event_callback)
-                        request.events.on('disconnect', () => db.events.removeListener(eventname, event_callback))
-                        setInterval(() => h.event({event:'keep-alive'}), 10000)
-                        return h.event({event:'registered', data: {eventname:eventname}})
-                    }
-                    return Boom.badRequest('Unrecognized event name')
+                    events = request.params.eventname.split(',')
+                    events.array.forEach(event_name => addEventListener (db, event_name, h));
                 })
-            }
+            },
+
         ]);
     }
 }
