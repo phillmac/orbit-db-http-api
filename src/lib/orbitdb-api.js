@@ -97,8 +97,9 @@ class OrbitdbAPI {
                     db.events.removeListener(event_name, event_callback)
                     clearInterval(keepalive)
                 })
+            } else {
+                throw Boom.badRequest('Unrecognized event name')
             }
-            throw Boom.badRequest('Unrecognized event name')
         }
 
         Promise.resolve(this.server.register(Susie)).catch((err) => {throw err});
