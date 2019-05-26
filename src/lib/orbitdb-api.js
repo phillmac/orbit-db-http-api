@@ -82,9 +82,8 @@ class OrbitdbAPI {
                     db.events.removeListener(event_name, event_callback)
                     clearInterval(keepalive)
                 })
-                return h.event({event:'registered', data: {eventname:event_name}})
             }
-            return Boom.badRequest('Unrecognized event name')
+            throw Boom.badRequest('Unrecognized event name')
         }
 
         Promise.resolve(this.server.register(Susie)).catch((err) => {throw err});
@@ -270,6 +269,7 @@ class OrbitdbAPI {
                 handler: dbMiddleware( async (db, request, h) => {
                     let events = request.params.eventname.split(',')
                     events.forEach(event_name => addEventListener (db, event_name, request, h));
+                    return h.event({event:'registered', data: {eventname:event_name}})
                 })
             },
 
