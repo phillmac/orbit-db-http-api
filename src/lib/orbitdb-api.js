@@ -77,7 +77,7 @@ class OrbitdbAPI {
             let event_callback = event_map.get(event_name)
             if(event_callback){
                 db.events.on(event_name, event_callback)
-                keepalive = setInterval(() => h.event({event:'keep-alive'}), 10000)
+               let keepalive = setInterval(() => h.event({event:'keep-alive'}), 10000)
                 request.events.on('disconnect', () => {
                     db.events.removeListener(event_name, event_callback)
                     clearInterval(keepalive)
