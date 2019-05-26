@@ -60,6 +60,8 @@ class OrbitdbAPI {
             let event_map = new Map(Object.entries({
                 'replicated': (address) =>
                     h.event({event:'replicated', data: {address:address}}),
+                'replicate': (address) =>
+                    h.event({event:'replicate', data: {address:address}}),
                 'replicate.progress': (address, hash, entry, progress, have) =>
                     h.event({event:'replicate.progress', data: {address:address, hash:hash, entry:entry, progress:progress, have:have}}),
                 'load': (dbname) =>
