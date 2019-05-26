@@ -56,7 +56,7 @@ class OrbitdbAPI {
             return contents
         };
 
-        addEventListener = (db, event_name, h) => {
+        addEventListener = (db, event_name, request, h) => {
             let event_map = new Map(Object.entries({
                 'replicated': (address) =>
                     h.event({event:'replicated', data: {address:address}}),
@@ -269,7 +269,7 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
                     let events = request.params.eventname.split(',')
-                    events.forEach(event_name => addEventListener (db, event_name, h));
+                    events.forEach(event_name => addEventListener (db, event_name, request, h));
                 })
             },
 
