@@ -268,8 +268,8 @@ class OrbitdbAPI {
                 method: 'GET',
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
-                    events = request.params.eventname.split(',')
-                    events.array.forEach(event_name => addEventListener (db, event_name, h));
+                    let events = request.params.eventname.split(',')
+                    events.forEach(event_name => addEventListener (db, event_name, h));
                 })
             },
 
