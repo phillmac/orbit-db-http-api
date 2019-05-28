@@ -85,6 +85,7 @@ class OrbitdbAPI {
                     clearInterval(keepalive)
                 })
             } else {
+                if(this.debug) throw Boom.badRequest(`Unrecognized event name: $(event_name)`)
                 throw Boom.badRequest('Unrecognized event name')
             }
         }
