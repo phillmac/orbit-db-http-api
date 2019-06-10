@@ -1,6 +1,6 @@
 {
     "name": "orbit-db-http-api",
-    "version": "0.3.0-rc.1",
+    "version": "0.3.0-rc.2",
     "description": "An HTTP API Server for the OrbitDB distributed peer-to-peer database",
     "main": "src/cli.js",
     "keywords": [
@@ -28,10 +28,10 @@
     "dependencies": {
       "docopt": "~0.6.2",
       "hapi": ">17.0.0",
-      "http2": "^3.2.0",
-      "susie": ">=3.0.0",
-      "ipfs": "^0.35.0",
+      "http2":"^3.2.0",
+      "ipfs": "^0.36.3",
       "ipfs-http-client": "^30.0.0",
-      "orbit-db": "^0.20.0"
+      "orbit-db": "^0.21.1",
+      "susie": "^3.0.0"
     }
   }

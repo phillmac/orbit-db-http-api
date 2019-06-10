@@ -9,7 +9,6 @@ class OrbitdbAPI {
     constructor (dbm, server_opts) {
         let comparisons, rawiterator, getraw, unpack_contents, listener;
         let dbMiddleware, addEventListener;
-
         this.debug = false;
 
         listener = Http2.createSecureServer(server_opts.http2_opts);
@@ -278,7 +277,7 @@ class OrbitdbAPI {
                 method: ['POST', 'PUT'],
                 path: '/db/{dbname}/access/write',
                 handler: dbMiddleware( async (db, request, _h) => {
-                    await db.access.grant('write', request.payload.publicKey)
+                    await db.access.grant('write', request.payload.id)
                     return {};
                 })
             },
