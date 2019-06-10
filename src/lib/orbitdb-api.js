@@ -263,7 +263,7 @@ class OrbitdbAPI {
                 method: ['POST', 'PUT'],
                 path: '/db/{dbname}/access/write',
                 handler: dbMiddleware( async (db, request, _h) => {
-                    await db.access.grant('write', request.payload.publicKey)
+                    await db.access.grant('write', request.payload.id)
                     return {};
                 })
             },

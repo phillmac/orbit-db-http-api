@@ -26,6 +26,7 @@
   - [POST|PUT /db/:dbname/put](#post-put-dbdbnameput)
   - [POST|PUT /db/:dbname/inc](#post-put-dbdbnameinc)
   - [POST|PUT /db/:dbname/inc/:val](#post-put-dbdbnameincval)
+  - [POST|PUT /db/:dbname/access/write](#post-put-dbdbnameaccesswrite)
   - [DELETE /db/:dbname](#delete-dbdbname)
   - [DELETE /db/:dbname/:item](#delete-dbdbnameitem)
 - [Contribute](#contribute)
@@ -394,6 +395,18 @@ Returns a multihash of the new counter value.
 
 ```shell
 curl -X POST http://localhost:3000/db/counter/inc/100
+```
+
+```json
+zdpuAmHw9Tcc4pyVjcVX3rJNJ7SGffmu4EwjodzmaPBVGGzbd
+```
+
+### POST|PUT /db/:dbname/access/write
+
+Adds the id to the list of peers who have write access to the :dbname data store.
+
+```shell
+curl -X POST http://localhost:3000/db/docstore/access/write -d 'id=045757bffcc7a4...'
 ```
 
 ```json
