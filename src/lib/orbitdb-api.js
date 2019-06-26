@@ -206,6 +206,7 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/query',
                 handler: dbMiddleware( async (db, request, _h) => {
                     let qparams, comparison, query;
+                    console.log('Query reqest payload', request.payload)
                     qparams = request.payload;
                     comparison = comparisons[qparams.comp || 'all'];
                     query = (doc) => comparison(doc[qparams.propname || '_id'], ...qparams.values);
