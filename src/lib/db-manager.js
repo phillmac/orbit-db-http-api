@@ -24,8 +24,9 @@ class DBManager {
             } else {
                 console.log(`Opening db ${dbn}`);
                 db = await orbitdb.open(dbn, params);
+                console.log(`Loading db ${dbn}`);
                 await db.load();
-                console.log(`Loaded db ${db.dbname}`);
+                console.log(`Finished loading db ${db.dbname}`);
                 _dbs[db.dbname] = db;
                 return db;
             }
