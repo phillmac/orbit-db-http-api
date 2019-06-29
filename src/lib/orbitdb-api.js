@@ -188,7 +188,7 @@ class OrbitdbAPI {
                 })
             },
             {
-                method: 'GET',
+                method: 'POST',
                 path: '/db/{dbname}/query',
                 handler: dbMiddleware( async (db, request, _h) => {
                     let qparams, comparison, query;

@@ -14,19 +14,19 @@
   - [GET /dbs](#get-dbs)
   - [GET /db/:dbname](#get-dbdbname)
   - [GET /db/:dbname/value](#get-dbdbnamevalue)
-  - [GET /db/:dbname/query](#get-dbdbnamequery)
-    - [Modulus Query](#modulus-query)
-    - [Range Query](#range-query)
   - [GET /db/:dbname/:item](#get-dbdbnameitem)
   - [GET /db/:dbname/iterator](#get-dbdbnameiterator)
   - [GET /db/:dbname/index](#get-dbdbnameindex)
   - [GET /identity](#get-identity)
   - [POST /db/:dbname](#post-dbdbname)
+  - [POST /db/:dbname/query](#post-dbdbnamequery)
+    - [Modulus Query](#modulus-query)
+    - [Range Query](#range-query)
   - [POST|PUT /db/:dbname/add](#post-put-dbdbnameadd)
   - [POST|PUT /db/:dbname/put](#post-put-dbdbnameput)
   - [POST|PUT /db/:dbname/inc](#post-put-dbdbnameinc)
   - [POST|PUT /db/:dbname/inc/:val](#post-put-dbdbnameincval)
-  - [POST|PUT /db/:dbname/access/write](#post-put-dbdbnameaccesswrite)
+  - [POST|PUT /db/:dbname/access/writ](#post-put-dbdbnameaccesswrite)
   - [DELETE /db/:dbname](#delete-dbdbname)
   - [DELETE /db/:dbname/:item](#delete-dbdbnameitem)
 - [Contribute](#contribute)
@@ -120,76 +120,6 @@ curl -X GET http://localhost:3000/db/counter/value
 
 ```json
 1
-```
-
-### GET /db/:dbname/query
-
-Queries the database :dbname.
-
-Returns a list of found items as a JSON array.
-
-```shell
-curl http://localhost:3000/db/docstore/query -X GET -H "Content-Type: application/json" --data '{"values":[]}'
-```
-
-```json
-[{"project":"OrbitDB","site":"https://github.com/orbitdb/orbit-db","likes":200},{"project":"IPFS","site":"https://ipfs.io","likes":400}]
-```
-
-To query a subset of data, a condition can be specified. For example, to
-retrieve only those entries which have a total number of likes above 300:
-
-```shell
-curl http://localhost:3000/db/docstore/query -X GET -H "Content-Type: application/json" --data '{"propname":"likes","comp":">","values":[300]}'
-```
-
-```json
-[{"project":"IPFS","site":"https://ipfs.io","likes":400}]
-```
-
-Available operator short-codes are:
-
-```eq```    propname equals value. Equivalent to "=="
-
-```ne```    propname is not equals to value. Equivalent to "!="
-
-```gt```    propname is greater than value. Equivalent to ">"
-
-```lt```    propname is less than value. Equivalent to "<"
-
-```gte```   propname is greater than or equal to value. Equivalent to ">="
-
-```lte```   propname is less than or equal to value. Equivalent to "<="
-
-```mod```   Perform a modulus calculation on propname using value. Equivalent to "%"
-
-```range``` Perform a range query, comparing propname to min and max.
-
-```all```   Fetch all records for field propname. Equivalent to "*"
-
-#### Modulus Query
-
-When using a modulus query, you must supply the divisor and the remainder. For example, to obtain all likes which are multiples of 100, you would specify a divisor 100 and a remainder 0:
-
-```shell
-curl -X GET http://localhost:3000/db/docstore/query -H "Content-Type:application/json" --data '{"propname":"likes", "comp":"mod", "values":[100,0]}'
-```
-
-```json
-[{"site":"https://ipfs.io","likes":400,"project":"IPFS"},{"site":"https://github.com/orbitdb/orbit-db","likes":200,"project":"OrbitDB"}]
-```
-
-#### Range Query
-
-When specifying a range query, you must supply the min and max
-values. For example, to obtain all likes greater than 250 but less than 1000 the min and max must be supplied:
-
-```shell
-curl -X GET http://localhost:3000/db/docstore/query -H "Content-Type:application/json" --data '{"propname":"likes", "comp":"range", "values":[250,1000]}'
-```
-
-```json
-[{"site":"https://ipfs.io","likes":400,"project":"IPFS"},{"site":"https://github.com/orbitdb/orbit-db","likes":200,"project":"OrbitDB"}]
 ```
 
 ### GET /db/:dbname/:item
@@ -334,6 +264,76 @@ overwrite flag:
 
 ```shell
 curl http://localhost:3000/db/docstore -d "create=true" -d "type=docstore" -d "overwrite=true"
+```
+
+### POST /db/:dbname/query
+
+Queries the database :dbname.
+
+Returns a list of found items as a JSON array.
+
+```shell
+curl http://localhost:3000/db/docstore/query -X GET -H "Content-Type: application/json" --data '{"values":[]}'
+```
+
+```json
+[{"project":"OrbitDB","site":"https://github.com/orbitdb/orbit-db","likes":200},{"project":"IPFS","site":"https://ipfs.io","likes":400}]
+```
+
+To query a subset of data, a condition can be specified. For example, to
+retrieve only those entries which have a total number of likes above 300:
+
+```shell
+curl http://localhost:3000/db/docstore/query -X GET -H "Content-Type: application/json" --data '{"propname":"likes","comp":">","values":[300]}'
+```
+
+```json
+[{"project":"IPFS","site":"https://ipfs.io","likes":400}]
+```
+
+Available operator short-codes are:
+
+```eq```    propname equals value. Equivalent to "=="
+
+```ne```    propname is not equals to value. Equivalent to "!="
+
+```gt```    propname is greater than value. Equivalent to ">"
+
+```lt```    propname is less than value. Equivalent to "<"
+
+```gte```   propname is greater than or equal to value. Equivalent to ">="
+
+```lte```   propname is less than or equal to value. Equivalent to "<="
+
+```mod```   Perform a modulus calculation on propname using value. Equivalent to "%"
+
+```range``` Perform a range query, comparing propname to min and max.
+
+```all```   Fetch all records for field propname. Equivalent to "*"
+
+#### Modulus Query
+
+When using a modulus query, you must supply the divisor and the remainder. For example, to obtain all likes which are multiples of 100, you would specify a divisor 100 and a remainder 0:
+
+```shell
+curl -X POST http://localhost:3000/db/docstore/query -H "Content-Type:application/json" --data '{"propname":"likes", "comp":"mod", "values":[100,0]}'
+```
+
+```json
+[{"site":"https://ipfs.io","likes":400,"project":"IPFS"},{"site":"https://github.com/orbitdb/orbit-db","likes":200,"project":"OrbitDB"}]
+```
+
+#### Range Query
+
+When specifying a range query, you must supply the min and max
+values. For example, to obtain all likes greater than 250 but less than 1000 the min and max must be supplied:
+
+```shell
+curl -X GET http://localhost:3000/db/docstore/query -H "Content-Type:application/json" --data '{"propname":"likes", "comp":"range", "values":[250,1000]}'
+```
+
+```json
+[{"site":"https://ipfs.io","likes":400,"project":"IPFS"},{"site":"https://github.com/orbitdb/orbit-db","likes":200,"project":"OrbitDB"}]
 ```
 
 ### POST|PUT /db/:dbname/add
