@@ -67,6 +67,8 @@ class DBManager {
                     path: db.options.path,
                     replicate: db.options.replicate,
                 },
+                canAppend: db.access.write.includes(orbitdb.identity.id),
+                write: db.access.write,
                 type: db.type,
                 uid: db.uid,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
