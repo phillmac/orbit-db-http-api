@@ -67,11 +67,12 @@ class DBManager {
                     path: db.options.path,
                     replicate: db.options.replicate,
                 },
-                canAppend: db.access.write.includes(orbitdb.identity.id),
-                write: db.access.write,
+                canAppend: (db.access.write || db.access._options.write).includes(orbitdb.identity.id),
+                write: db.access.write || db.access._options.write,
                 type: db.type,
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
+                accessControlerType: db.access.type || 'custom',
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
                         Object.entries({
