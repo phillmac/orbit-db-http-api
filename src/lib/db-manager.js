@@ -51,6 +51,21 @@ class DBManager {
             return JSON.stringify(db_info_list);
         };
 
+        _db_write = (db) => {
+            return (
+                db.access.write ||
+                (typeof db.access.get == 'function' && db.access.get('write')) ||
+                db.access._options.write ||
+                'unavaliable'
+            );
+        }
+
+        this.db_write = (dbn) => {
+            let db = find_db(dbn);
+            if (!db) return {};
+            return _db_write(db);
+        }
+
         this.db_info = (dbn) => {
             let db = find_db(dbn);
             if (!db) return {};
@@ -67,8 +82,8 @@ class DBManager {
                     path: db.options.path,
                     replicate: db.options.replicate,
                 },
-                canAppend: (db.access.write || db.access._options.write).includes(orbitdb.identity.id),
-                write: db.access.write || db.access._options.write,
+                canAppend: db.access.canAppend({identity: orbitdb.identity}),
+                write: _db_write(db),
                 type: db.type,
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
