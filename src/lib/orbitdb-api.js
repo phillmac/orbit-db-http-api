@@ -286,6 +286,11 @@ class OrbitdbAPI {
             },
             {
                 method: 'GET',
+                path: '/db/{dbname}/access/write/list',
+                handler: dbMiddleware( async (db, _request, _h) => db.access.write)
+            },
+            {
+                method: 'GET',
                 path: '/db/{dbname}/events/{eventname}',
                 handler: dbMiddleware( async (db, request, h) => {
                     let events = request.params.eventname.split(',')
