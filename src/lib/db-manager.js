@@ -51,7 +51,7 @@ class DBManager {
             return JSON.stringify(db_info_list);
         };
 
-        _db_write = (db) => {
+        let _db_write = (db) => {
             return (
                 db.access.write ||
                 (typeof db.access.get == 'function' && db.access.get('write')) ||

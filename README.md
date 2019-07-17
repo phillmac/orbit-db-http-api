@@ -26,7 +26,7 @@
   - [POST|PUT /db/:dbname/put](#postput-dbdbnameput)
   - [POST|PUT /db/:dbname/inc](#postput-dbdbnameinc)
   - [POST|PUT /db/:dbname/inc/:val](#postput-dbdbnameincval)
-  - [POST|PUT /db/:dbname/access/writ](#postput-dbdbnameaccesswrite)
+  - [POST|PUT /db/:dbname/access/write](#postput-dbdbnameaccesswrite)
   - [DELETE /db/:dbname](#delete-dbdbname)
   - [DELETE /db/:dbname/:item](#delete-dbdbnameitem)
 - [Contribute](#contribute)
