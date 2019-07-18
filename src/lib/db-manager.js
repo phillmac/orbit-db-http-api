@@ -69,6 +69,7 @@ class DBManager {
         this.db_info = (dbn) => {
             let db = find_db(dbn);
             if (!db) return {};
+            let __db_write = _db_write(db)
             return {
                 address: db.address,
                 dbname: db.dbname,
@@ -82,8 +83,8 @@ class DBManager {
                     path: db.options.path,
                     replicate: db.options.replicate,
                 },
-                canAppend: db.access.canAppend({identity: orbitdb.identity}),
-                write: _db_write(db),
+                canAppend: orbitdb.identity in __db_write,
+                write: __db_write,
                 type: db.type,
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
