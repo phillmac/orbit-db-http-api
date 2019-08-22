@@ -128,6 +128,50 @@ class DBManager {
         if(options.announceDBS) {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
+
+        setInterval(this.connect_orbitdb_peers, 300000)
+
+        this.connect_orbitdb_peers =  async () => {
+            let orbitdb_peers = []
+            if (!connectLockout) {
+                connectLockout = true
+                console.info(moment().format('ll h:m:s'), 'Connecting OrbitDb peers');
+                for (let dbRoot of [...new Set(Object.values(dbs).map(d => d.address.root))]) {
+                    console.info(`Finding peers for ${dbRoot}`)
+                    try {
+                        dbPeers = await ipfs.dht.findProvs(dbRoot)
+                        console.info(`Found ${dbPeers.length} peers`)
+                        for (let peer of dbPeers) {
+                            peerId = peer.id.toB58String();
+                            if ((!(peerId in orbitdb_peers)) && (peerId != orbitdb.id)) {
+                                orbitdb_peers.push(peerId)
+                            }
+                        }
+                    } catch (ex) {
+                        console.info('Finding peers failed: ', ex)
+                    }
+                }
+                let swarm_peers = await ipfs.swarm.peers();
+                for (let peerInfo of orbitdb_peers) {
+                    if (ipfsPeerConnected(swarm_peers, peerInfo)) {
+                        ipfsPing(peerInfo);
+                    } else {
+                        console.info(`Looking up peer ${peerInfo}`);
+                        try {
+                            peerAddr = await ipfs.dht.findPeer(peerInfo);
+                            console.info('peerAddr: ', peerAddr);
+                            try{
+                                await ipfs.swarm.connect(peerAddr)
+                            } catch (ex) {
+                                ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerInfo}`)
+                            }
+                        } catch (ex) {}
+                    }
+                }
+                connectLockout = false
+                console.info('Finished connecting OrbitDb peers');
+            }
+        }
     }
 }
 
