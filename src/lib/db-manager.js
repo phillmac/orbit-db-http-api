@@ -120,7 +120,7 @@ class DBManager {
             console.info('Announcing DBs')
             for (let db of Object.values(_dbs)) {
                 try {
-                    await ipfs.dht.provide(new Ipfs.CID(db.address.root));
+                    await ipfs.dht.provide(new CID(db.address.root));
                 } catch (ex) {}
             }
         }
