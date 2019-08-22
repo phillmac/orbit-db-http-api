@@ -1,6 +1,9 @@
+const CID = require('cids')
+
 class DBManager {
-    constructor(orbitdb){
+    constructor(orbitdb, ipfs, options={}){
         let _dbs = {};
+        let dbPeers = {}
 
         let find_db = (dbn)  => {
             let result
@@ -28,6 +31,7 @@ class DBManager {
                 await db.load();
                 console.log(`Finished loading db ${db.dbname}`);
                 _dbs[db.dbname] = db;
+                ipfs.dht.provide(new CID(db.address.root));
                 return db;
             }
         };
@@ -89,6 +93,8 @@ class DBManager {
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
+                peers: dbPeers[db.id] || [],
+                peerCount:  (dbPeers[db.id] || []).length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
                         Object.entries({
@@ -109,6 +115,19 @@ class DBManager {
         this.identity = () => {
             return orbitdb.identity;
         };
+
+        this.announce_dbs = async () => {
+            console.info('Announcing DBs')
+            for (let db of Object.values(_dbs)) {
+                try {
+                    await ipfs.dht.provide(new Ipfs.CID(db.address.root));
+                } catch (ex) {}
+            }
+        }
+
+        if(options.announceDBS) {
+            setInterval(this.announce_dbs, options.announceInterval || 1800000);
+        }
     }
 }
 
