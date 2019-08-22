@@ -93,8 +93,8 @@ class DBManager {
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
-                peers: dbPeers[db.id] || [],
-                peerCount:  (dbPeers[db.id] || []).length,
+                peers: dbPeers[d.address.root] || [],
+                peerCount:  (dbPeers[d.address.root] || []).length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
                         Object.entries({
@@ -130,27 +130,30 @@ class DBManager {
         }
 
         setInterval(this.connect_orbitdb_peers, 300000)
+        setInterval(this.find_orbitdb_peers, 300000)
 
-        this.connect_orbitdb_peers =  async () => {
-            let orbitdb_peers = []
+        this.find_orbitdb_peers =  async () => {
+            console.info(moment().format('ll h:m:s'), 'Connecting OrbitDb peers');
+            for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
+                console.info(`Finding peers for ${dbRoot}`)
+                try {
+                    dbPeers = await ipfs.dht.findProvs(dbRoot)
+                    console.info(`Found ${dbPeers.length} peers`)
+                    for (let peer of dbPeers) {
+                        peerId = peer.id.toB58String();
+                        if(!(peerId in dbPeers[dbRoot])) {
+                            dbPeers[dbRoot].push(peerId)
+                        }
+                    }
+                } catch (ex) {
+                    console.info('Finding peers failed: ', ex)
+                }
+            }
+        }
+
+        this.connect_orbitdb_peers = async () => {
             if (!connectLockout) {
                 connectLockout = true
-                console.info(moment().format('ll h:m:s'), 'Connecting OrbitDb peers');
-                for (let dbRoot of [...new Set(Object.values(dbs).map(d => d.address.root))]) {
-                    console.info(`Finding peers for ${dbRoot}`)
-                    try {
-                        dbPeers = await ipfs.dht.findProvs(dbRoot)
-                        console.info(`Found ${dbPeers.length} peers`)
-                        for (let peer of dbPeers) {
-                            peerId = peer.id.toB58String();
-                            if ((!(peerId in orbitdb_peers)) && (peerId != orbitdb.id)) {
-                                orbitdb_peers.push(peerId)
-                            }
-                        }
-                    } catch (ex) {
-                        console.info('Finding peers failed: ', ex)
-                    }
-                }
                 let swarm_peers = await ipfs.swarm.peers();
                 for (let peerInfo of orbitdb_peers) {
                     if (ipfsPeerConnected(swarm_peers, peerInfo)) {
