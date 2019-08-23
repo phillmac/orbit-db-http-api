@@ -24,7 +24,7 @@ class OrbitdbAPI {
             if (!response.isBoom) {
                 return h.continue;
             }
-            console.error(response)
+            Logger.error(response)
             if (this.debug) {
                 response.output.payload.message = String(response)
             }
@@ -209,7 +209,7 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/query',
                 handler: dbMiddleware( async (db, request, _h) => {
                     let qparams, comparison, query;
-                    console.log('Query reqest payload', request.payload)
+                    Logger.debug('Query reqest payload', request.payload)
                     qparams = request.payload;
                     comparison = comparisons[qparams.comp || 'all'];
                     query = (doc) => comparison(doc[qparams.propname || '_id'], ...qparams.values);

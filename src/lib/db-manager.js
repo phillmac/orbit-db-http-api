@@ -31,7 +31,7 @@ class DBManager {
             } else {
                 Logger.info(`Opening db ${dbn}`);
                 db = await orbitdb.open(dbn, params);
-                console.log(`Loading db ${dbn}`);
+                Logger.info(`Loading db ${dbn}`);
                 await db.load();
                 Logger.info(`Loaded db ${db.dbname}`);
                 _dbs[db.dbname] = db;
@@ -122,7 +122,7 @@ class DBManager {
         };
 
         this.announce_dbs = async () => {
-            console.info('Announcing DBs')
+            Logger.info('Announcing DBs')
             for (let db of Object.values(_dbs)) {
                 try {
                     await ipfs.dht.provide(new CID(db.address.root));
@@ -139,12 +139,12 @@ class DBManager {
                 reject(new Exception('Already finding peers'))
             }
             findPeersLockout = true;
-            console.info('Finding OrbitDb peers');
+            Logger.info('Finding OrbitDb peers');
             for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
-                console.info(`Finding peers for ${dbRoot}`)
+                Logger.info(`Finding peers for ${dbRoot}`)
                 try {
                     dbPeers = await ipfs.dht.findProvs(dbRoot)
-                    console.info(`Found ${dbPeers.length} peers`)
+                    Logger.info(`Found ${dbPeers.length} peers`)
                     for (let peer of dbPeers) {
                         peerId = peer.id.toB58String();
                         if(!(peerId in dbPeers[dbRoot])) {
@@ -152,37 +152,38 @@ class DBManager {
                         }
                     }
                 } catch (ex) {
-                    console.info('Finding peers failed: ', ex)
+                    Logger.debug('Finding peers failed: ', ex)
                 }
             }
             findPeersLockout = false;
-            console.info('Finnished finding OrbitDb peers');
+            Logger.info('Finished finding OrbitDb peers');
             resolve([...new Set(Object.values(dbPeers))]);
         }
 
         this.connect_orbitdb_peers = async (peersList) => {
             if (!connectLockout) {
                 connectLockout = true
-                console.info('Connecting OrbitDb peers');
+                Logger.info('Connecting OrbitDb peers');
                 let swarmPeers = await ipfs.swarm.peers();
                 for (let peerInfo of peersList) {
                     if (ipfsPeerConnected(swarmPeers, peerInfo)) {
                         ipfsPing(peerInfo);
                     } else {
-                        console.info(`Looking up peer ${peerInfo}`);
+                        Logger.info(`Looking up peer ${peerInfo}`);
                         try {
                             peerAddr = await ipfs.dht.findPeer(peerInfo);
-                            console.info('peerAddr: ', peerAddr);
                             try{
                                 await ipfs.swarm.connect(peerAddr)
                             } catch (ex) {
                                 ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerInfo}`)
                             }
-                        } catch (ex) {}
+                        } catch (ex) {
+                            Logger.debug(ex)
+                        }
                     }
                 }
                 connectLockout = false
-                console.info('Finished connecting OrbitDb peers');
+                Logger.info('Finished connecting OrbitDb peers');
             }
         }
 
@@ -191,7 +192,7 @@ class DBManager {
                 let peersList = await new Promise ((resolve, reject) => this.find_orbitdb_peers(resolve, reject))
                 this.connect_orbitdb_peers(peersList)
             } catch (ex) {
-                console.debug(ex)
+                Logger.debug(ex)
             }
         }, 300000)
 

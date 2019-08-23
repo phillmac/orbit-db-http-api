@@ -108,7 +108,7 @@ async function init () {
         }
 
         if (args['--debug']) {
-            console.log('Debug enabled')
+            Logger.info('Debug enabled')
             orbitdb_api.debug = true
         }
 
