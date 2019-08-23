@@ -137,27 +137,28 @@ class DBManager {
         let find_orbitdb_peers =  async (resolve, reject) => {
             if (findPeersLockout) {
                 reject(new Error('Already finding peers'))
-            }
-            findPeersLockout = true;
-            Logger.info('Finding OrbitDb peers');
-            for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
-                Logger.info(`Finding peers for ${dbRoot}`)
-                try {
-                    dbPeers = await ipfs.dht.findProvs(dbRoot)
-                    Logger.info(`Found ${dbPeers.length} peers`)
-                    for (let peer of dbPeers) {
-                        peerId = peer.id.toB58String();
-                        if(!(peerId in dbPeers[dbRoot])) {
-                            dbPeers[dbRoot].push(peerId)
+            } else {
+                findPeersLockout = true;
+                Logger.info('Finding OrbitDb peers');
+                for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
+                    Logger.info(`Finding peers for ${dbRoot}`)
+                    try {
+                        dbPeers = await ipfs.dht.findProvs(dbRoot)
+                        Logger.info(`Found ${dbPeers.length} peers`)
+                        for (let peer of dbPeers) {
+                            peerId = peer.id.toB58String();
+                            if(!(peerId in dbPeers[dbRoot])) {
+                                dbPeers[dbRoot].push(peerId)
+                            }
                         }
+                    } catch (ex) {
+                        Logger.debug('Finding peers failed: ', ex)
                     }
-                } catch (ex) {
-                    Logger.debug('Finding peers failed: ', ex)
                 }
+                findPeersLockout = false;
+                Logger.info('Finished finding OrbitDb peers');
+                resolve([...new Set(Object.values(dbPeers))]);
             }
-            findPeersLockout = false;
-            Logger.info('Finished finding OrbitDb peers');
-            resolve([...new Set(Object.values(dbPeers))]);
         }
 
         this.find_orbitdb_peers = find_orbitdb_peers;
