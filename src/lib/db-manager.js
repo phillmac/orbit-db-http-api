@@ -151,6 +151,7 @@ class DBManager {
                     }
                 }
                 findPeersLockout = false;
+                console.info('Finnished finding OrbitDb peers');
             }
         }
 
