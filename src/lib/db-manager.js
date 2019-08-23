@@ -132,7 +132,7 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        this.find_orbitdb_peers =  async () => {
+        this.find_orbitdb_peers =  async (resolve, reject) => {
             if (!findPeersLockout) {
                 findPeersLockout = true;
                 console.info('Finding OrbitDb peers');
@@ -149,20 +149,24 @@ class DBManager {
                         }
                     } catch (ex) {
                         console.info('Finding peers failed: ', ex)
+                        reject(ex)
                     }
                 }
                 findPeersLockout = false;
+                resolve([...new Set(Object.values(dbPeers))]);
                 console.info('Finnished finding OrbitDb peers');
+            } else {
+                reject(new Exception('Already finding peers'))
             }
         }
 
-        this.connect_orbitdb_peers = async () => {
+        this.connect_orbitdb_peers = async (peersList) => {
             if (!connectLockout) {
                 connectLockout = true
                 console.info('Connecting OrbitDb peers');
-                let swarm_peers = await ipfs.swarm.peers();
-                for (let peerInfo of [...new Set(Object.values(dbPeers))]) {
-                    if (ipfsPeerConnected(swarm_peers, peerInfo)) {
+                let swarmPeers = await ipfs.swarm.peers();
+                for (let peerInfo of peersList) {
+                    if (ipfsPeerConnected(swarmPeers, peerInfo)) {
                         ipfsPing(peerInfo);
                     } else {
                         console.info(`Looking up peer ${peerInfo}`);
@@ -183,9 +187,10 @@ class DBManager {
         }
 
         setInterval(async function() {
-            await this.connect_orbitdb_peers
-            await this.find_orbitdb_peers
-
+            try {
+                let peersList = await new Promise ((resolve, reject) => this.find_orbitdb_peers(resolve, reject))
+                this.connect_orbitdb_peers(peersList)
+            } catch (ex) {}
         }, 300000)
 
         function ipfsPeerConnected(swarm_peers, peerAddr) {
