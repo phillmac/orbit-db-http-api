@@ -133,31 +133,29 @@ class DBManager {
         }
 
         this.find_orbitdb_peers =  async (resolve, reject) => {
-            if (!findPeersLockout) {
-                findPeersLockout = true;
-                console.info('Finding OrbitDb peers');
-                for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
-                    console.info(`Finding peers for ${dbRoot}`)
-                    try {
-                        dbPeers = await ipfs.dht.findProvs(dbRoot)
-                        console.info(`Found ${dbPeers.length} peers`)
-                        for (let peer of dbPeers) {
-                            peerId = peer.id.toB58String();
-                            if(!(peerId in dbPeers[dbRoot])) {
-                                dbPeers[dbRoot].push(peerId)
-                            }
-                        }
-                    } catch (ex) {
-                        console.info('Finding peers failed: ', ex)
-                        reject(ex)
-                    }
-                }
-                findPeersLockout = false;
-                resolve([...new Set(Object.values(dbPeers))]);
-                console.info('Finnished finding OrbitDb peers');
-            } else {
+            if (findPeersLockout) {
                 reject(new Exception('Already finding peers'))
             }
+            findPeersLockout = true;
+            console.info('Finding OrbitDb peers');
+            for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
+                console.info(`Finding peers for ${dbRoot}`)
+                try {
+                    dbPeers = await ipfs.dht.findProvs(dbRoot)
+                    console.info(`Found ${dbPeers.length} peers`)
+                    for (let peer of dbPeers) {
+                        peerId = peer.id.toB58String();
+                        if(!(peerId in dbPeers[dbRoot])) {
+                            dbPeers[dbRoot].push(peerId)
+                        }
+                    }
+                } catch (ex) {
+                    console.info('Finding peers failed: ', ex)
+                }
+            }
+            findPeersLockout = false;
+            console.info('Finnished finding OrbitDb peers');
+            resolve([...new Set(Object.values(dbPeers))]);
         }
 
         this.connect_orbitdb_peers = async (peersList) => {
