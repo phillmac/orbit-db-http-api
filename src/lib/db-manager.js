@@ -153,6 +153,7 @@ class DBManager {
                         }
                     } catch (ex) {
                         Logger.debug('Finding peers failed: ', ex)
+                        reject(ex)
                     }
                 }
                 findPeersLockout = false;
