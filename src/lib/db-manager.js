@@ -161,7 +161,7 @@ class DBManager {
                 connectLockout = true
                 console.info('Connecting OrbitDb peers');
                 let swarm_peers = await ipfs.swarm.peers();
-                for (let peerInfo of [...new Set(Object.values(dbPeers).map(p => p))]) {
+                for (let peerInfo of [...new Set(Object.values(dbPeers))]) {
                     if (ipfsPeerConnected(swarm_peers, peerInfo)) {
                         ipfsPing(peerInfo);
                     } else {
