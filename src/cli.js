@@ -3,7 +3,18 @@
 const fs        = require('fs');
 const {docopt}  = require('docopt');
 const version   = require('../package.json').version;
-const http2     = require('http2')
+const Logger    = require('js-logger')
+
+
+
+Logger.useDefaults({
+    defaultLevel: Logger.TRACE,
+    formatter: function (messages, _context) {
+        d = new Date()
+        messages.unshift(`${d.toLocaleDateString()} ${d.toLocaleTimeString()}`)
+    }
+});
+
 
 class Cli {
     constructor() {
@@ -102,10 +113,10 @@ async function init () {
         }
 
         await orbitdb_api.server.start()
-        console.log(`Server running on port ${api_port}`);
+        Logger.info(`Server running on port ${api_port}`);
 
     } catch(err) {
-        console.error(err);
+        Logger.error(err);
         process.exit(1);
     }
 }

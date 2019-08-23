@@ -1,4 +1,6 @@
 const CID = require('cids')
+const Logger    = require('js-logger')
+
 
 class DBManager {
     constructor(orbitdb, ipfs, options={}){
@@ -27,11 +29,11 @@ class DBManager {
             if (db) {
                 return db;
             } else {
-                console.log(`Opening db ${dbn}`);
+                Logger.info(`Opening db ${dbn}`);
                 db = await orbitdb.open(dbn, params);
                 console.log(`Loading db ${dbn}`);
                 await db.load();
-                console.log(`Finished loading db ${db.dbname}`);
+                Logger.info(`Loaded db ${db.dbname}`);
                 _dbs[db.dbname] = db;
                 dbPeers[db.address.root] = []
                 ipfs.dht.provide(new CID(db.address.root));
@@ -44,7 +46,7 @@ class DBManager {
             if (db) {
                 await db.close()
                 delete _dbs[db.dbname];
-                console.log(`Unloaded db ${db.dbname}`);
+                Logger.info(`Unloaded db ${db.dbname}`);
             }
         }
 

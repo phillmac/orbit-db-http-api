@@ -1,7 +1,8 @@
-const Hapi  = require('hapi');
-const Boom  = require('boom');
-const Http2 = require('http2');
-const Susie = require('susie');
+const Hapi      = require('hapi');
+const Boom      = require('boom');
+const Http2     = require('http2');
+const Susie     = require('susie');
+const Logger    = require('js-logger')
 
 require('events').EventEmitter.defaultMaxListeners = 50  //Set warning higher then normal to handle many clients
 
