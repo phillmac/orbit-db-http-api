@@ -7,4 +7,4 @@ WORKDIR /api
 
 COPY . .
 
-RUN npm install
+RUN npm install --only=prod
