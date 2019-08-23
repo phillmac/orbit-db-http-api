@@ -134,7 +134,7 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        this.find_orbitdb_peers =  async (resolve, reject) => {
+        let find_orbitdb_peers =  async (resolve, reject) => {
             if (findPeersLockout) {
                 reject(new Exception('Already finding peers'))
             }
@@ -160,7 +160,11 @@ class DBManager {
             resolve([...new Set(Object.values(dbPeers))]);
         }
 
-        this.connect_orbitdb_peers = async (peersList) => {
+        this.find_orbitdb_peers = find_orbitdb_peers;
+
+
+
+        let connect_orbitdb_peers = async (peersList) => {
             if (!connectLockout) {
                 connectLockout = true
                 Logger.info('Connecting OrbitDb peers');
@@ -187,10 +191,12 @@ class DBManager {
             }
         }
 
+        this.connect_orbitdb_peers = connect_orbitdb_peers;
+
         setInterval(async function() {
             try {
-                let peersList = await new Promise ((resolve, reject) => this.find_orbitdb_peers(resolve, reject))
-                this.connect_orbitdb_peers(peersList)
+                let peersList = await new Promise ((resolve, reject) => find_orbitdb_peers(resolve, reject))
+                connect_orbitdb_peers(peersList)
             } catch (ex) {
                 Logger.debug(ex)
             }
