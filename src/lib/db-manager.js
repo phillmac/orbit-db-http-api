@@ -206,7 +206,15 @@ class DBManager {
               return true;
             }
             return false;
-          }
+        }
+
+        function swarmFindPeer(swarm_peers, peerAddr) {
+            for (let peerInfo of swarm_peers) {
+              if (peerAddr.includes(peerInfo.peer.toB58String())) {
+                return peerInfo;
+              }
+            }
+        }
     }
 }
 
