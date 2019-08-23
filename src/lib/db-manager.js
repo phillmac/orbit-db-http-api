@@ -188,7 +188,9 @@ class DBManager {
             try {
                 let peersList = await new Promise ((resolve, reject) => this.find_orbitdb_peers(resolve, reject))
                 this.connect_orbitdb_peers(peersList)
-            } catch (ex) {}
+            } catch (ex) {
+                console.debug(ex)
+            }
         }, 300000)
 
         function ipfsPeerConnected(swarm_peers, peerAddr) {
