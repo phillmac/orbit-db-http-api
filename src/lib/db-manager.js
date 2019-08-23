@@ -3,7 +3,8 @@ const CID = require('cids')
 class DBManager {
     constructor(orbitdb, ipfs, options={}){
         let _dbs = {};
-        let dbPeers = {}
+        let dbPeers = {};
+        let connectLockout;
 
         let find_db = (dbn)  => {
             let result
