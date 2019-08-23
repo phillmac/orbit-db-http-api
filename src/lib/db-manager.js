@@ -182,8 +182,18 @@ class DBManager {
             }
         }
 
-        setInterval(this.connect_orbitdb_peers, 300000)
-        setInterval(this.find_orbitdb_peers, 300000)
+        setInterval(async function() {
+            await this.connect_orbitdb_peers
+            await this.find_orbitdb_peers
+
+        }, 300000)
+
+        function ipfsPeerConnected(swarm_peers, peerAddr) {
+            if (swarmFindPeer(swarm_peers, peerAddr)) {
+              return true;
+            }
+            return false;
+          }
     }
 }
 
