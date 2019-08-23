@@ -152,6 +152,7 @@ class DBManager {
         this.connect_orbitdb_peers = async () => {
             if (!connectLockout) {
                 connectLockout = true
+                console.info('Connecting OrbitDb peers');
                 let swarm_peers = await ipfs.swarm.peers();
                 for (let peerInfo of orbitdb_peers) {
                     if (ipfsPeerConnected(swarm_peers, peerInfo)) {
