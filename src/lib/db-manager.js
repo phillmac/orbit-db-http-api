@@ -130,7 +130,7 @@ class DBManager {
         }
 
         this.find_orbitdb_peers =  async () => {
-            console.info('Connecting OrbitDb peers');
+            console.info('Finding OrbitDb peers');
             for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
                 console.info(`Finding peers for ${dbRoot}`)
                 try {
