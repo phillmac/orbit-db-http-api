@@ -162,8 +162,6 @@ class DBManager {
 
         this.find_orbitdb_peers = find_orbitdb_peers;
 
-
-
         let connect_orbitdb_peers = async (peersList) => {
             if (!connectLockout) {
                 connectLockout = true
