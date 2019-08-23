@@ -129,9 +129,6 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        setInterval(this.connect_orbitdb_peers, 300000)
-        setInterval(this.find_orbitdb_peers, 300000)
-
         this.find_orbitdb_peers =  async () => {
             console.info(moment().format('ll h:m:s'), 'Connecting OrbitDb peers');
             for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
@@ -175,6 +172,9 @@ class DBManager {
                 console.info('Finished connecting OrbitDb peers');
             }
         }
+
+        setInterval(this.connect_orbitdb_peers, 300000)
+        setInterval(this.find_orbitdb_peers, 300000)
     }
 }
 
