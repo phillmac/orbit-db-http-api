@@ -46,6 +46,7 @@ class DBManager {
             if (db) {
                 await db.close()
                 delete _dbs[db.dbname];
+                delete dbPeers[db.address.root];
                 Logger.info(`Unloaded db ${db.dbname}`);
             }
         }
@@ -98,7 +99,10 @@ class DBManager {
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
-                peers: dbPeers[db.address.root],
+                peers: dbPeers[db.address.root].map(p => {
+                    id: p.id.toB58String()
+                    multiaddrs: p.multiaddrs.map(m=>m.toString())
+                }),
                 peerCount:  (dbPeers[db.address.root]).length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
@@ -145,12 +149,7 @@ class DBManager {
                     try {
                         dbPeers = await ipfs.dht.findProvs(dbRoot, {timeout: 180000})
                         Logger.info(`Found ${dbPeers.length} peers`)
-                        for (let peer of dbPeers) {
-                            peerId = peer.id.toB58String();
-                            if(!(peerId in dbPeers[dbRoot])) {
-                                dbPeers[dbRoot].push(peerId)
-                            }
-                        }
+                        dbPeers[dbRoot] = dbPeers
                     } catch (ex) {
                         Logger.debug('Finding peers failed: ', ex)
                         reject(ex)
@@ -169,21 +168,20 @@ class DBManager {
                 connectLockout = true
                 Logger.info('Connecting OrbitDb peers');
                 let swarmPeers = await ipfs.swarm.peers();
-                for (let peerID of peersList) {
-                    if (ipfsPeerConnected(swarmPeers, peerID)) {
-                        ipfsPing(peerID);
+                for (let peerInfo of peersList) {
+                    peerId = peerInfo.id.toB58String();
+                    if (ipfsPeerConnected(swarmPeers, peerId)) {
+                        ipfsPing(peerInfo);
                     } else {
-                        Logger.info(`Looking up peer ${peerID}`);
                         try {
-                            peerAddr = await ipfs.dht.findPeer(peerID);
                             try{
-                                await ipfs.swarm.connect(peerAddr)
+                                await ipfs.swarm.connect(peerInfo)
                             } catch (ex) {
                                 Logger.info('Trying p2p-circuit')
-                                ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerID}`)
+                                ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerId}`)
                             }
                         } catch (ex) {
-                            Logger.debug(ex)
+                            Logger.debug(`Unable to connect to ${peerId}`, ex)
                         }
                     }
                 }
@@ -217,6 +215,15 @@ class DBManager {
               }
             }
         }
+
+        function ipfsPing(peerInfo) {
+            peerId = peerInfo.id.toB58String();
+            ipfs.ping(peerInfo, function(err, _responses) {
+                if (err) {
+                    Logger.trace(`Error pinging ${peerId}`, err);
+                }
+            });
+          }
     }
 }
 
