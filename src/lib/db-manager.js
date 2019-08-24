@@ -136,7 +136,7 @@ class DBManager {
 
         let find_orbitdb_peers =  async (resolve, reject) => {
             if (findPeersLockout) {
-                reject(new Error('Already finding peers'))
+                reject('Already finding peers')
             } else {
                 findPeersLockout = true;
                 Logger.info('Finding OrbitDb peers');
