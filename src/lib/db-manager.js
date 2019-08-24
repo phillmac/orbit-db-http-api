@@ -169,17 +169,18 @@ class DBManager {
                 connectLockout = true
                 Logger.info('Connecting OrbitDb peers');
                 let swarmPeers = await ipfs.swarm.peers();
-                for (let peerInfo of peersList) {
-                    if (ipfsPeerConnected(swarmPeers, peerInfo)) {
-                        ipfsPing(peerInfo);
+                for (let peerID of peersList) {
+                    if (ipfsPeerConnected(swarmPeers, peerID)) {
+                        ipfsPing(peerID);
                     } else {
-                        Logger.info(`Looking up peer ${peerInfo}`);
+                        Logger.info(`Looking up peer ${peerID}`);
                         try {
-                            peerAddr = await ipfs.dht.findPeer(peerInfo);
+                            peerAddr = await ipfs.dht.findPeer(peerID);
                             try{
                                 await ipfs.swarm.connect(peerAddr)
                             } catch (ex) {
-                                ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerInfo}`)
+                                Logger.info('Trying p2p-circuit')
+                                ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerID}`)
                             }
                         } catch (ex) {
                             Logger.debug(ex)
