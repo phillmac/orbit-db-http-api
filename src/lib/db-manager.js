@@ -147,7 +147,7 @@ class DBManager {
                 for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
                     Logger.info(`Finding peers for ${dbRoot}`)
                     try {
-                        dbPeers = await ipfs.dht.findProvs(dbRoot, {timeout: 180000})
+                        dbPeers = await ipfs.dht.findProvs(dbRoot)
                         Logger.info(`Found ${dbPeers.length} peers`)
                         dbPeers[dbRoot] = dbPeers
                     } catch (ex) {
