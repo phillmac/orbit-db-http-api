@@ -218,7 +218,7 @@ class DBManager {
 
         function ipfsPing(peerInfo) {
             peerId = peerInfo.id.toB58String();
-            ipfs.ping(peerInfo, function(err, _responses) {
+            ipfs.ping(peerId, function(err, _responses) {
                 if (err) {
                     Logger.trace(`Error pinging ${peerId}`, err);
                 }
