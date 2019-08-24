@@ -169,7 +169,7 @@ class DBManager {
                 Logger.info('Connecting OrbitDb peers');
                 let swarmPeers = await ipfs.swarm.peers();
                 for (let peerInfo of peersList) {
-                    Logger.dir(peerInfo)
+                    Logger.debug(peerInfo)
                     peerId = peerInfo.id.toB58String();
                     if (ipfsPeerConnected(swarmPeers, peerId)) {
                         ipfsPing(peerInfo);
