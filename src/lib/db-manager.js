@@ -191,7 +191,7 @@ class DBManager {
         }
 
         this.get_peers = () => {
-            return peersList.map(p => {
+            return Object.values(peersList).map(p => {
                 id: p.id.toB58String()
                 multiaddrs: p.p.multiaddrs.map(m=>m.toString())
             })
