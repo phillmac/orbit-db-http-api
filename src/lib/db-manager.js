@@ -155,7 +155,7 @@ class DBManager {
 
         }
 
-        let find_db_peers = (db, options={
+        this.find_db_peers = (db, options={
             resolvePeerAddrs: false,
             ipfs: {}
         }) => {
@@ -182,19 +182,17 @@ class DBManager {
             return peerSearches[db.id], true;
         }
 
-        this.find_db_peers = find_db_peers;
-
         this.get_db_peers = (db) => {
             return dbPeers[db.id].map(p => {
                 id: p.id.toB58String()
-                multiaddrs: p.p.multiaddrs.map(m=>m.toString())
+                multiaddrs: p.multiaddrs.map(m=>m.toString())
             })
         }
 
         this.get_peers = () => {
             return Object.values(peersList).map(p => {
                 id: p.id.toB58String()
-                multiaddrs: p.p.multiaddrs.map(m=>m.toString())
+                multiaddrs: p.multiaddrs.map(m=>m.toString())
             })
         }
 
