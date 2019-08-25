@@ -136,7 +136,13 @@ class DBManager {
         }
 
         this.get_searches = () => {
-            return Object.keys(peerSearches)
+            return Object.keys(peerSearches).map(k=>{
+                return {
+                    addr:k,
+                    started: peerSearches[k].started,
+                    options: peerSearches[k].options
+                }
+            })
         }
 
         let resolvePeerAddr = async (peerId) => {
