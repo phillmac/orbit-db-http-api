@@ -8,3 +8,5 @@ WORKDIR /api
 COPY . .
 
 RUN npm ci --only=prod
+
+RUN git remote set-url origin https://github.com/phillmac/orbit-db-http-api-dev.git
