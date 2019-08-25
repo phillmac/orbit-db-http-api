@@ -6,8 +6,6 @@ class DBManager {
     constructor(orbitdb, ipfs, options={}){
         let _dbs = {};
         let dbPeers = {};
-        let connectLockout;
-        let findPeersLockout;
         let peerSearches = {};
         let peersList = {};
 
@@ -199,70 +197,6 @@ class DBManager {
             })
         }
 
-
-        let find_orbitdb_peers =  async (resolve, reject) => {
-            if (findPeersLockout) {
-                reject('Already finding peers')
-            } else {
-                findPeersLockout = true;
-                Logger.info('Finding OrbitDb peers');
-                for (let dbRoot of [...new Set(Object.values(_dbs).map(d => d.address.root))]) {
-                    Logger.info(`Finding peers for ${dbRoot}`)
-                    try {
-                        dbPeers = await ipfs.dht.findProvs(dbRoot)
-                        Logger.info(`Found ${dbPeers.length} peers`)
-                        dbPeers[dbRoot] = dbPeers
-                    } catch (ex) {
-                        Logger.debug('Finding peers failed: ', ex)
-                        reject(ex)
-                    }
-                }
-                findPeersLockout = false;
-                Logger.info('Finished finding OrbitDb peers');
-                resolve([...new Set(Object.values(dbPeers))]);
-            }
-        }
-
-        this.find_orbitdb_peers = find_orbitdb_peers;
-
-        let connect_orbitdb_peers = async (peersList) => {
-            if (!connectLockout) {
-                connectLockout = true
-                Logger.info('Connecting OrbitDb peers');
-                let swarmPeers = await ipfs.swarm.peers();
-                for (let peerInfo of peersList) {
-                    Logger.debug(peerInfo)
-                    peerId = peerInfo.id.toB58String();
-                    if (ipfsPeerConnected(swarmPeers, peerId)) {
-                        ipfsPing(peerInfo);
-                    } else {
-                        try {
-                            try{
-                                await ipfs.swarm.connect(peerInfo)
-                            } catch (ex) {
-                                Logger.info('Trying p2p-circuit')
-                                ipfs.swarm.connect(`/p2p-circuit/ipfs/${peerId}`)
-                            }
-                        } catch (ex) {
-                            Logger.debug(`Unable to connect to ${peerId}`, ex)
-                        }
-                    }
-                }
-                connectLockout = false
-                Logger.info('Finished connecting OrbitDb peers');
-            }
-        }
-
-        this.connect_orbitdb_peers = connect_orbitdb_peers;
-
-        // setInterval(async function() {
-        //     try {
-        //         let peersList = await new Promise ((resolve, reject) => find_orbitdb_peers(resolve, reject))
-        //         connect_orbitdb_peers(peersList)
-        //     } catch (ex) {
-        //         Logger.debug(ex)
-        //     }
-        // }, 300000)
 
         function ipfsPeerConnected(swarm_peers, peerAddr) {
             if (swarmFindPeer(swarm_peers, peerAddr)) {
