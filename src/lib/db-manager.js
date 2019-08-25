@@ -146,10 +146,11 @@ class DBManager {
             Logger.info(`Resolving addrs for ${peerId}`);
             search = ipfs.dht.findPeer(peerId)
             peerSearches[peerId] = search.then((results)=>{
-                delete peerSearches[peerId];
                 peersList[peerId] = results
+                delete peerSearches[peerId];
+                return results
             }).catch((err) => {
-                delete peerSearches[db.id]
+                delete peerSearches[peerId]
                 Logger.info(`Error while resolving addrs for ${peerId}`, err);
             });
             return peerSearches[peerId], true;
