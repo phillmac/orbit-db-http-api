@@ -152,7 +152,10 @@ class DBManager {
                 dbPeers[db.id] = result
                 db.events.emit('peers.found', {event:'peers.found', data:{peers:result}})
                 Logger.info(`Finished finding peers for ${db.id}`);
-            })
+            }).catch((err) => {
+                delete peerSearches[db.id]
+                Logger.info(`Error while finding peers for ${db.id}`, err);
+            });
             return true;
         }
 
