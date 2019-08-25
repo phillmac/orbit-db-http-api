@@ -144,7 +144,7 @@ class DBManager {
         let resolvePeerAddr = async (peerId) => {
             if(peerSearches[peerId]) return peerSearches[peerId], false;
             Logger.info(`Resolving addrs for ${peerId}`);
-            search = ipfs.dht.findPeer(peerId)
+            let search = ipfs.dht.findPeer(peerId)
             peerSearches[peerId] = search.then((results)=>{
                 peersList[peerId] = results
                 delete peerSearches[peerId];
@@ -162,10 +162,10 @@ class DBManager {
         }) => {
             if(peerSearches[db.id]) return peerSearches[db.id], false;
             Logger.info(`Finding peers for ${db.id}`);
-            search = ipfs.dht.findProvs(db.address.root)
+            let search = ipfs.dht.findProvs(db.address.root)
             peerSearches[db.id] = search.then(async (results) => {
                 if (options.resolvePeerAddrs) {
-                    addrs = await Promise.all(results.map((p) => {
+                    let addrs = await Promise.all(results.map((p) => {
                         resolvePeerAddr(p.id.toB58String())
                     }));
                     Logger.debug(`Found peer addrs ${addrs}`)
