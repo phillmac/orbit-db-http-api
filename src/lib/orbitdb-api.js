@@ -309,7 +309,7 @@ class OrbitdbAPI {
             {
                 method: 'GET',
                 path: '/peers/searches',
-                handler: dbm.get_searches
+                handler: (_request, _h) => dbm.get_searches()
             },
 
             {
