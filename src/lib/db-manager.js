@@ -37,7 +37,7 @@ class DBManager {
                 await db.load();
                 Logger.info(`Loaded db ${db.dbname}`);
                 _dbs[db.dbname] = db;
-                dbPeers[db.address.root] = []
+                dbPeers[db.id] = []
                 ipfs.dht.provide(new CID(db.address.root));
                 return db;
             }
@@ -188,7 +188,6 @@ class DBManager {
         this.find_db_peers = find_db_peers;
 
         let get_db_peers = (db) => {
-            if (!dbPeers[db.id]) return []
             return dbPeers[db.id].map(p => {
                 id: p.id.toB58String()
                 multiaddrs: p.p.multiaddrs.map(m=>m.toString())
