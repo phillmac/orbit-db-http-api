@@ -156,11 +156,12 @@ class DBManager {
         }
 
         let find_db_peers = (db, options={
-            resolvePeerAddrs: false
+            resolvePeerAddrs: false,
+            ipfs: {}
         }) => {
             if(peerSearches[db.id]) return peerSearches[db.id], false;
             Logger.info(`Finding peers for ${db.id}`);
-            let search = ipfs.dht.findProvs(db.address.root)
+            let search = ipfs.dht.findProvs(db.address.root, options.ipfs || {})
             peerSearches[db.id] = search.then(async (results) => {
                 if (options.resolvePeerAddrs) {
                     let addrs = await Promise.all(results.map((p) => {
