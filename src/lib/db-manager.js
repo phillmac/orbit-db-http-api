@@ -181,8 +181,8 @@ class DBManager {
                 }).catch((err) => {
                     delete peerSearches[db.id]
                     Logger.info(`Error while finding peers for ${db.id}`, err);
-                });
-        }
+                })
+            }
             return peerSearches[db.id], true;
         }
 
