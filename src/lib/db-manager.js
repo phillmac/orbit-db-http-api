@@ -8,6 +8,7 @@ class DBManager {
         let dbPeers = {};
         let connectLockout;
         let findPeersLockout;
+        let peerSearches = {};
 
         let find_db = (dbn)  => {
             let result
@@ -135,13 +136,24 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        let find_db_peers = async (db, options={}) => {
+        let get_searches = () => {
+            return Object.keys(peerSearches)
+        }
+
+        this.get_searches = get_searches;
+
+        let find_db_peers = (db, options={}) => {
+            if(peerSearches[db.id]) return false;
             Logger.info(`Finding peers for ${db.id}`);
-            let dbRoot = db.address.root
-            let dbPeers = await ipfs.dht.findProvs(dbRoot);
-            dbPeers[dbRoot] = dbPeers;
-            Logger.info('Done');
-            return dbPeers;
+            search = ipfs.dht.findProvs(dbRoot)
+            peerSearches[db.id] = search
+            search.then((result) => {
+                delete peerSearches[db.id]
+                dbPeers[db.id] = result
+                db.events.emit('peers.found', result)
+                Logger.info(`Finished finding peers for ${db.id}`);
+            })
+            return true;
         }
 
         this.find_db_peers = find_db_peers;

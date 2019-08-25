@@ -303,9 +303,13 @@ class OrbitdbAPI {
             {
                 method: 'GET',
                 path: '/db/{dbname}/peers',
-                handler: dbMiddleware( async (db, request, h) => {
-                   return await dbm.find_db_peers(db);
-                })
+                handler: dbMiddleware((db, _request, _h) => dbm.find_db_peers(db))
+            },
+
+            {
+                method: 'GET',
+                path: '/peers/searches',
+                handler: dbm.get_searches()
             },
 
         ]);
