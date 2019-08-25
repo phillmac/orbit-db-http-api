@@ -101,7 +101,7 @@ class DBManager {
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
-                peers: get_db_peers(db),
+                peers: this.get_db_peers(db),
                 peerCount:  (dbPeers[db.id]).length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
