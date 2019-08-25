@@ -137,8 +137,8 @@ class DBManager {
 
         let find_db_peers = async (db, options={}) => {
             Logger.info(`Finding peers for ${db.id}`);
-            dbRoot = db.address.root
-            dbPeers = await ipfs.dht.findProvs(dbRoot);
+            let dbRoot = db.address.root
+            let dbPeers = await ipfs.dht.findProvs(dbRoot);
             dbPeers[dbRoot] = dbPeers;
             Logger.info('Done');
             return dbPeers;
@@ -147,8 +147,8 @@ class DBManager {
         this.find_db_peers = find_db_peers;
 
         let get_db_peers = (db) => {
-            dbRoot = db.address.root
-            return dbPeers[db.address.root].map(p => {
+            let dbRoot = db.address.root
+            return dbPeers[dbRoot].map(p => {
                 id: p.id.toB58String()
                 multiaddrs: p.multiaddrs.map(m=>m.toString())
             })
