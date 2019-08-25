@@ -137,7 +137,7 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        let get_searches = () => {
+        this.get_searches = () => {
             return Object.keys(peerSearches)
         }
 
@@ -156,8 +156,6 @@ class DBManager {
             return peerSearches[peerId], true;
 
         }
-
-        this.get_searches = get_searches;
 
         let find_db_peers = (db, options={
             resolvePeerAddrs: false
