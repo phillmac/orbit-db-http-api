@@ -9,6 +9,7 @@ class DBManager {
         let connectLockout;
         let findPeersLockout;
         let peerSearches = {};
+        let peersList = {};
 
         let find_db = (dbn)  => {
             let result
@@ -140,31 +141,55 @@ class DBManager {
             return Object.keys(peerSearches)
         }
 
+        let resolvePeerAddr = async (peerId) => {
+            if(peerSearches[peerId]) return peerSearches[peerId], false;
+            Logger.info(`Resolving addrs for ${peerId}`);
+            search = ipfs.dht.findPeer(peerId)
+            peerSearches[peerId] = search.then((results)=>{
+                delete peerSearches[peerId];
+                peersList[peerId] = results
+            }).catch((err) => {
+                delete peerSearches[db.id]
+                Logger.info(`Error while resolving addrs for ${peerId}`, err);
+            });
+            return peerSearches[peerId], true;
+
+        }
+
         this.get_searches = get_searches;
 
-        let find_db_peers = (db, options={}) => {
-            if(peerSearches[db.id]) return false;
+        let find_db_peers = (db, options={
+            resolvePeerAddrs: false
+        }) => {
+            if(peerSearches[db.id]) return peerSearches[db.id], false;
             Logger.info(`Finding peers for ${db.id}`);
             search = ipfs.dht.findProvs(db.address.root)
-            peerSearches[db.id] = search
-            search.then((result) => {
+            peerSearches[db.id] = search.then((results) => {
                 delete peerSearches[db.id]
-                dbPeers[db.id] = result
-                db.events.emit('peers.found', {event:'peers.found', data:{peers:result}})
+                if (options.resolvePeerAddrs) {
+                    addrs = await Promise.all(results.map((p) => {
+                        resolvePeerAddr(p.id.toB58String())
+                    }));
+                    Logger.debug(`Found peer addrs ${addrs}`)
+                } else {
+                    dbPeers[db.id] = results
+                }
+                db.events.emit('peers.found', {event:'peers.found', data:{peers:dbPeers[db.id]}})
                 Logger.info(`Finished finding peers for ${db.id}`);
             }).catch((err) => {
                 delete peerSearches[db.id]
                 Logger.info(`Error while finding peers for ${db.id}`, err);
             });
-            return true;
+            return peerSearches[db.id], true;
         }
 
         this.find_db_peers = find_db_peers;
 
         let get_db_peers = (db) => {
+            if (!dbPeers[db.id]) return []
             return dbPeers[db.id].map(p => {
                 id: p.id.toB58String()
-                multiaddrs: p.multiaddrs.map(m=>m.toString())
+                multiaddrs: p.p.multiaddrs.map(m=>m.toString())
             })
         }
 
