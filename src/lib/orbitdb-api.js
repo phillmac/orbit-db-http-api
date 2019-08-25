@@ -315,7 +315,7 @@ class OrbitdbAPI {
             {
                 method: 'POST',
                 path: '/peers/searches/db/{dbname}',
-                handler: dbMiddleware((db, _request, _h) => dbm.find_db_peers(db))
+                handler: dbMiddleware((db, request, _h) => dbm.find_db_peers(db, request.payload))
             },
 
         ]);
