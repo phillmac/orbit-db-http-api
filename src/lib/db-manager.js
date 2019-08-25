@@ -164,7 +164,7 @@ class DBManager {
             if(peerSearches[db.id]) return peerSearches[db.id], false;
             Logger.info(`Finding peers for ${db.id}`);
             search = ipfs.dht.findProvs(db.address.root)
-            peerSearches[db.id] = search.then((results) => {
+            peerSearches[db.id] = search.then(async (results) => {
                 delete peerSearches[db.id]
                 if (options.resolvePeerAddrs) {
                     addrs = await Promise.all(results.map((p) => {
