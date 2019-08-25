@@ -162,23 +162,27 @@ class DBManager {
             if(peerSearches[db.id]) return peerSearches[db.id], false;
             Logger.info(`Finding peers for ${db.id}`);
             let search = ipfs.dht.findProvs(db.address.root, options.ipfs || {})
-            peerSearches[db.id] = search.then(async (results) => {
-                if (options.resolvePeerAddrs) {
-                    let addrs = await Promise.all(results.map((p) => {
-                        resolvePeerAddr(p.id.toB58String())
-                    }));
-                    Logger.debug(`Found peer addrs ${addrs}`)
-                } else {
-                    dbPeers[db.id] = results
-                }
-                db.events.emit('peers.found', {event:'peers.found', data:{peers:dbPeers[db.id]}})
-                Logger.info(`Finished finding peers for ${db.id}`);
-                delete peerSearches[db.id]
-                return dbPeers[db.id]
-            }).catch((err) => {
-                delete peerSearches[db.id]
-                Logger.info(`Error while finding peers for ${db.id}`, err);
-            });
+            peerSearches[db.id] = {
+                started: Date.now(),
+                options: options,
+                search: search.then(async (results) => {
+                    if (options.resolvePeerAddrs) {
+                        let addrs = await Promise.all(results.map((p) => {
+                            resolvePeerAddr(p.id.toB58String())
+                        }));
+                        Logger.debug(`Found peer addrs ${addrs}`)
+                    } else {
+                        dbPeers[db.id] = results
+                    }
+                    db.events.emit('peers.found', {event:'peers.found', data:{peers:dbPeers[db.id]}})
+                    Logger.info(`Finished finding peers for ${db.id}`);
+                    delete peerSearches[db.id]
+                    return dbPeers[db.id]
+                }).catch((err) => {
+                    delete peerSearches[db.id]
+                    Logger.info(`Error while finding peers for ${db.id}`, err);
+                });
+        }
             return peerSearches[db.id], true;
         }
 
