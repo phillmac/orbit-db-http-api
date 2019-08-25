@@ -185,14 +185,20 @@ class DBManager {
 
         this.find_db_peers = find_db_peers;
 
-        let get_db_peers = (db) => {
+        this.get_db_peers = (db) => {
             return dbPeers[db.id].map(p => {
                 id: p.id.toB58String()
                 multiaddrs: p.p.multiaddrs.map(m=>m.toString())
             })
         }
 
-        this.get_db_peers = get_db_peers;
+        this.get_peers = () => {
+            return peersList.map(p => {
+                id: p.id.toB58String()
+                multiaddrs: p.p.multiaddrs.map(m=>m.toString())
+            })
+        }
+
 
         let find_orbitdb_peers =  async (resolve, reject) => {
             if (findPeersLockout) {
