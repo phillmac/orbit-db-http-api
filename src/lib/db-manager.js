@@ -101,7 +101,7 @@ class DBManager {
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
                 peers: get_db_peers(db),
-                peerCount:  (dbPeers[db.address.root]).length,
+                peerCount:  (dbPeers[db.id]).length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
                         Object.entries({
@@ -145,7 +145,7 @@ class DBManager {
         let find_db_peers = (db, options={}) => {
             if(peerSearches[db.id]) return false;
             Logger.info(`Finding peers for ${db.id}`);
-            search = ipfs.dht.findProvs(dbRoot)
+            search = ipfs.dht.findProvs(db.address.root)
             peerSearches[db.id] = search
             search.then((result) => {
                 delete peerSearches[db.id]
@@ -162,8 +162,7 @@ class DBManager {
         this.find_db_peers = find_db_peers;
 
         let get_db_peers = (db) => {
-            let dbRoot = db.address.root
-            return dbPeers[dbRoot].map(p => {
+            return dbPeers[db.id].map(p => {
                 id: p.id.toB58String()
                 multiaddrs: p.multiaddrs.map(m=>m.toString())
             })
