@@ -99,10 +99,7 @@ class DBManager {
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
-                peers: dbPeers[db.address.root].map(p => {
-                    id: p.id.toB58String()
-                    multiaddrs: p.multiaddrs.map(m=>m.toString())
-                }),
+                peers: get_db_peers(db),
                 peerCount:  (dbPeers[db.address.root]).length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
@@ -137,6 +134,27 @@ class DBManager {
         if(options.announceDBS) {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
+
+        let find_db_peers = async (db, options={}) => {
+            Logger.info(`Finding peers for ${db.id}`);
+            dbRoot = db.address.root
+            dbPeers = await ipfs.dht.findProvs(dbRoot);
+            dbPeers[dbRoot] = dbPeers;
+            Logger.info('Done');
+            return dbPeers;
+        }
+
+        this.find_db_peers = find_db_peers;
+
+        let get_db_peers = (db) => {
+            dbRoot = db.address.root
+            return dbPeers[db.address.root].map(p => {
+                id: p.id.toB58String()
+                multiaddrs: p.multiaddrs.map(m=>m.toString())
+            })
+        }
+
+        this.get_db_peers = get_db_peers;
 
         let find_orbitdb_peers =  async (resolve, reject) => {
             if (findPeersLockout) {
@@ -193,14 +211,14 @@ class DBManager {
 
         this.connect_orbitdb_peers = connect_orbitdb_peers;
 
-        setInterval(async function() {
-            try {
-                let peersList = await new Promise ((resolve, reject) => find_orbitdb_peers(resolve, reject))
-                connect_orbitdb_peers(peersList)
-            } catch (ex) {
-                Logger.debug(ex)
-            }
-        }, 300000)
+        // setInterval(async function() {
+        //     try {
+        //         let peersList = await new Promise ((resolve, reject) => find_orbitdb_peers(resolve, reject))
+        //         connect_orbitdb_peers(peersList)
+        //     } catch (ex) {
+        //         Logger.debug(ex)
+        //     }
+        // }, 300000)
 
         function ipfsPeerConnected(swarm_peers, peerAddr) {
             if (swarmFindPeer(swarm_peers, peerAddr)) {
@@ -211,9 +229,9 @@ class DBManager {
 
         function swarmFindPeer(swarm_peers, peerAddr) {
             for (let peerInfo of swarm_peers) {
-              if (peerAddr.includes(peerInfo.peer.toB58String())) {
-                return peerInfo;
-              }
+                if (peerAddr.includes(peerInfo.peer.toB58String())) {
+                    return peerInfo;
+                }
             }
         }
 
