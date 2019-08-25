@@ -165,7 +165,6 @@ class DBManager {
             Logger.info(`Finding peers for ${db.id}`);
             search = ipfs.dht.findProvs(db.address.root)
             peerSearches[db.id] = search.then(async (results) => {
-                delete peerSearches[db.id]
                 if (options.resolvePeerAddrs) {
                     addrs = await Promise.all(results.map((p) => {
                         resolvePeerAddr(p.id.toB58String())
@@ -176,6 +175,8 @@ class DBManager {
                 }
                 db.events.emit('peers.found', {event:'peers.found', data:{peers:dbPeers[db.id]}})
                 Logger.info(`Finished finding peers for ${db.id}`);
+                delete peerSearches[db.id]
+                return dbPeers[db.id]
             }).catch((err) => {
                 delete peerSearches[db.id]
                 Logger.info(`Error while finding peers for ${db.id}`, err);
