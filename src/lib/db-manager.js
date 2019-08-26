@@ -166,9 +166,8 @@ class DBManager {
             resolvePeerAddrs: {isNew: false, details: this.search_details[db.id]},
             ipfs: {}
         }) => {
-            if(peerSearches[db.id]) return {isNew: false, details: this.search_details[db.id]};
+            if(peerSearches[db.id]) return false;
             Logger.info(`Finding peers for ${db.id}`);
-            Logger.debug('options: ', options);
             let search = ipfs.dht.findProvs(db.address.root, options.ipfs || {})
             peerSearches[db.id] = {
                 started: Date.now(),
@@ -191,8 +190,7 @@ class DBManager {
                     Logger.info(`Error while finding peers for ${db.id}`, err);
                 })
             }
-            Logger.debug('options: ', options, 'details: ', search_details[db.id]);
-            return {isNew: true, details: search_details[db.id]};
+            return true;
         }
 
         this.get_db_peers = (db) => {
