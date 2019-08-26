@@ -191,7 +191,7 @@ class DBManager {
                     Logger.info(`Error while finding peers for ${db.id}`, err);
                 })
             }
-            Logger.debug('options: ', options);
+            Logger.debug('options: ', options, 'details: ', search_details[db.id]);
             return {isNew: true, details: search_details[db.id]};
         }
 
