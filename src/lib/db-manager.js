@@ -195,18 +195,19 @@ class DBManager {
 
         this.get_db_peers = (db) => {
             return dbPeers[db.id].map(p => {
-                console.dir(p.multiaddrs)
                 return {
                     id: p.id.toB58String(),
-                    multiaddrs: p.multiaddrs.toString()
+                    multiaddrs: p.multiaddrs.toArray().map(m=>m.toString())
                 }
             })
         }
 
         this.get_peers = () => {
             return Object.values(peersList).map(p => {
-                id: p.id.toB58String()
-                multiaddrs: p.multiaddrs.map(m=>m.toString())
+                return {
+                    id: p.id.toB58String(),
+                    multiaddrs: p.multiaddrs.toArray().map(m=>m.toString())
+                }
             })
         }
 
