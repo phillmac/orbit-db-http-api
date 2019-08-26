@@ -135,18 +135,18 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        this.get_searches = () => {
-            return Object.keys(peerSearches).map(k=>{
-                return {
-                    addr:k,
-                    started: peerSearches[k].started,
-                    options: peerSearches[k].options
-                }
-            })
+        this.search_details = (searchID) => {
+            return {
+                searchID:searchID,
+                started: peerSearches[searchID].started,
+                options: peerSearches[searchID].options
+            }
         }
 
+        this.get_searches = () => Object.keys(peerSearches).map(k=>this.search_details(k))
+
         let resolvePeerAddr = async (peerId) => {
-            if(peerSearches[peerId]) return peerSearches[peerId], false;
+            if(peerSearches[peerId]) return peerSearches[peerId], {isNew: false, details: this.search_details[peerId]};
             Logger.info(`Resolving addrs for ${peerId}`);
             let search = ipfs.dht.findPeer(peerId)
             peerSearches[peerId] = search.then((results)=>{
@@ -157,15 +157,15 @@ class DBManager {
                 delete peerSearches[peerId]
                 Logger.info(`Error while resolving addrs for ${peerId}`, err);
             });
-            return peerSearches[peerId], true;
+            return peerSearches[peerId], {isNew: true, details: this.search_details[peerId]};
 
         }
 
         this.find_db_peers = (db, options={
-            resolvePeerAddrs: false,
+            resolvePeerAddrs: {isNew: false, details: this.search_details[db.id]},
             ipfs: {}
         }) => {
-            if(peerSearches[db.id]) return peerSearches[db.id], false;
+            if(peerSearches[db.id]) return peerSearches[db.id], false, this.search_details[db.id];
             Logger.info(`Finding peers for ${db.id}`);
             let search = ipfs.dht.findProvs(db.address.root, options.ipfs || {})
             peerSearches[db.id] = {
@@ -189,7 +189,7 @@ class DBManager {
                     Logger.info(`Error while finding peers for ${db.id}`, err);
                 })
             }
-            return peerSearches[db.id], true;
+            return peerSearches[db.id], {isNew: true, details: this.search_details[db.id]};
         }
 
         this.get_db_peers = (db) => {
