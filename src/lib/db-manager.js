@@ -197,8 +197,9 @@ class DBManager {
 
         this.get_db_peers = (db) => {
             return dbPeers[db.id].map(p => {
-                id: p.id.toB58String()
+                return {id: p.id.toB58String(),
                 multiaddrs: p.multiaddrs.toString()
+                }
             })
         }
 
