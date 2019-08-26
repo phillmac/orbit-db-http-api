@@ -165,7 +165,7 @@ class DBManager {
             resolvePeerAddrs: {isNew: false, details: this.search_details[db.id]},
             ipfs: {}
         }) => {
-            if(peerSearches[db.id]) return peerSearches[db.id], false, this.search_details[db.id];
+            if(peerSearches[db.id]) return peerSearches[db.id], {isNew: false, details: this.search_details[db.id]};
             Logger.info(`Finding peers for ${db.id}`);
             let search = ipfs.dht.findProvs(db.address.root, options.ipfs || {})
             peerSearches[db.id] = {
