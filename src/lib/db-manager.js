@@ -135,13 +135,14 @@ class DBManager {
             setInterval(this.announce_dbs, options.announceInterval || 1800000);
         }
 
-        this.search_details = (searchID) => {
+        let search_details = (searchID) => {
             return {
                 searchID:searchID,
                 started: peerSearches[searchID].started,
                 options: peerSearches[searchID].options
             }
         }
+        this.search_details = search_details;
 
         this.get_searches = () => Object.keys(peerSearches).map(k=>this.search_details(k))
 
@@ -189,7 +190,7 @@ class DBManager {
                     Logger.info(`Error while finding peers for ${db.id}`, err);
                 })
             }
-            return {isNew: true, details: this.search_details[db.id]};
+            return {isNew: true, details: search_details[db.id]};
         }
 
         this.get_db_peers = (db) => {
