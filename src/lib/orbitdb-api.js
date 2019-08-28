@@ -7,16 +7,16 @@ const Logger    = require('js-logger')
 require('events').EventEmitter.defaultMaxListeners = 50  //Set warning higher then normal to handle many clients
 
 class OrbitdbAPI {
-    constructor (dbm, server_opts) {
-        let comparisons, rawiterator, getraw, unpack_contents, listener;
-        let dbMiddleware, addEventListener;
-        this.debug = false;
+    constructor (dbm, peerMan, options) {
+        if(options.orbitDBAPI.apiDebug) {
+            Logger.info('Debug enabled')
+        }
 
-        listener = Http2.createSecureServer(server_opts.http2_opts);
+        const listener = Http2.createSecureServer(options.server.http2);
         this.server = new Hapi.Server({
             listener,
             tls: true,
-            port: server_opts.api_port
+            port: options.server.httpsPort
         });
 
         this.server.ext('onPreResponse', (request, h) => {
@@ -25,13 +25,13 @@ class OrbitdbAPI {
                 return h.continue;
             }
             Logger.error(response)
-            if (this.debug) {
+            if (this.options.orbitDBAPI.apiDebug) {
                 response.output.payload.message = String(response)
             }
             return response
         });
 
-        comparisons = {
+        const comparisons = {
             'ne': (a, b) => a != b,
             'eq': (a, b) => a == b,
             'gt': (a, b) => a > b,
@@ -43,7 +43,7 @@ class OrbitdbAPI {
             'all': () => true
         };
 
-        dbMiddleware = fn =>
+        const dbMiddleware = fn =>
             async (request, h) => {
                 let db
                 db = await dbm.get(request.params.dbname)
@@ -51,13 +51,13 @@ class OrbitdbAPI {
                     .catch((err) => {throw err});
         };
 
-        rawiterator = (db, request, _h) =>
+        const rawIterator = (db, request, _h) =>
             db.iterator(request.payload).collect();
 
-        getraw = (db, request, _h) =>
+        const getRaw = (db, request, _h) =>
             db.get(request.params.item);
 
-        unpack_contents = (contents) => {
+        const unpackContents = (contents) => {
             if (contents){
                 if (contents.map) {
                    return contents.map((e) => {
@@ -71,7 +71,7 @@ class OrbitdbAPI {
             return contents
         };
 
-        addEventListener = (db, event_name, request, h) => {
+        const addEventListener = (db, event_name, request, h) => {
             let event_map = new Map(Object.entries({
                 'replicated': (address) =>
                     h.event({event:'replicated', data: {address:address}}),
@@ -100,7 +100,7 @@ class OrbitdbAPI {
                     clearInterval(keepalive)
                 })
             } else {
-                if(this.debug) throw Boom.badRequest(`Unrecognized event name: $(event_name)`)
+                if(options.orbitDBAPI.apiDebug) throw Boom.badRequest(`Unrecognized event name: $(event_name)`)
                 throw Boom.badRequest('Unrecognized event name')
             }
         }
@@ -221,7 +221,7 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/iterator',
                 handler:  dbMiddleware( async (db, request, h) => {
                     let raw;
-                    raw = rawiterator(db, request, h);
+                    raw = rawIterator(db, request, h);
                     return raw.map((e) => Object.keys(e.payload.value)[0]);
 
                 })
@@ -230,14 +230,14 @@ class OrbitdbAPI {
                 method: 'GET',
                 path: '/db/{dbname}/rawiterator',
                 handler: dbMiddleware( async (db, request, h) => {
-                    return rawiterator(db, request, h);
+                    return rawIterator(db, request, h);
                 })
             },
             {
                 method: 'GET',
                 path: '/db/{dbname}/raw/{item}',
                 handler: dbMiddleware( async (db, request, h) => {
-                    return getraw(db, request, h);
+                    return getRaw(db, request, h);
                 })
             },
             {
@@ -245,8 +245,8 @@ class OrbitdbAPI {
                 path: '/db/{dbname}/{item}',
                 handler: dbMiddleware( async (db, request, h) => {
                     let raw;
-                    raw = getraw(db, request, h);
-                    return unpack_contents(raw);
+                    raw = getRaw(db, request, h);
+                    return unpackContents(raw);
                 })
             },
             {
@@ -258,7 +258,7 @@ class OrbitdbAPI {
                         contents = db._query({limit:-1})
                        return contents.map((e) => Object.keys(e.payload.value)[0])
                     } else {
-                        return unpack_contents(db.all)
+                        return unpackContents(db.all)
                     }
                 })
             },
@@ -303,25 +303,25 @@ class OrbitdbAPI {
             {
                 method: 'GET',
                 path: '/db/{dbname}/peers',
-                handler: dbMiddleware((db, _request, _h) => dbm.get_db_peers(db))
+                handler: dbMiddleware((db, _request, _h) => peerMan.get_db_peers(db))
             },
 
             {
                 method: 'GET',
                 path: '/peers',
-                handler: (_request, _h) => dbm.get_peers()
+                handler: (_request, _h) => peerMan.get_peers()
             },
 
             {
                 method: 'GET',
                 path: '/peers/searches',
-                handler: (_request, _h) => dbm.get_searches()
+                handler: (_request, _h) => peerMan.get_searches()
             },
 
             {
                 method: 'POST',
                 path: '/peers/searches/db/{dbname}',
-                handler: dbMiddleware((db, request, _h) => dbm.find_db_peers(db, request.payload))
+                handler: dbMiddleware((db, request, _h) => peerMan.find_db_peers(db, request.payload))
             },
 
         ]);

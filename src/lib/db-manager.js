@@ -1,13 +1,9 @@
-const CID = require('cids')
 const Logger    = require('js-logger')
 
 
 class DBManager {
-    constructor(orbitdb, ipfs, options={}){
+    constructor(orbitdb, ipfs, peerMan, options={}){
         let _dbs = {};
-        let dbPeers = {};
-        let peerSearches = {};
-        let peersList = {};
 
         let find_db = (dbn)  => {
             let result
@@ -80,6 +76,7 @@ class DBManager {
             let db = find_db(dbn);
             if (!db) return {};
             let __db_write = _db_write(db)
+            let dbPeers = peerMan.dbPeers(db);
             return {
                 address: db.address,
                 dbname: db.dbname,
@@ -99,8 +96,8 @@ class DBManager {
                 uid: db.uid,
                 indexLength: db.index.length || Object.keys(db.index).length,
                 accessControlerType: db.access.type || 'custom',
-                peers: this.get_db_peers(db),
-                peerCount:  (dbPeers[db.id]).length,
+                peers: dbPeers,
+                peerCount: dbPeers.length,
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
                         Object.entries({
@@ -122,119 +119,6 @@ class DBManager {
             return orbitdb.identity;
         };
 
-        this.announce_dbs = async () => {
-            Logger.info('Announcing DBs')
-            for (let db of Object.values(_dbs)) {
-                try {
-                    await ipfs.dht.provide(new CID(db.address.root));
-                } catch (ex) {}
-            }
-        }
-
-        if(options.announceDBS) {
-            setInterval(this.announce_dbs, options.announceInterval || 1800000);
-        }
-
-        let search_details = (searchID) => {
-            return {
-                searchID:searchID,
-                started: peerSearches[searchID].started,
-                options: peerSearches[searchID].options
-            }
-        }
-        this.search_details = search_details;
-
-        this.get_searches = () => Object.keys(peerSearches).map(k=>this.search_details(k))
-
-        let resolvePeerAddr = async (peerId) => {
-            if(peerSearches[peerId]) return peerSearches[peerId], {isNew: false, details: this.search_details[peerId]};
-            Logger.info(`Resolving addrs for ${peerId}`);
-            let search = ipfs.dht.findPeer(peerId)
-            peerSearches[peerId] = search.then((results)=>{
-                peersList[peerId] = results
-                delete peerSearches[peerId];
-                return results
-            }).catch((err) => {
-                delete peerSearches[peerId]
-                Logger.info(`Error while resolving addrs for ${peerId}`, err);
-            });
-            return peerSearches[peerId], {isNew: true, details: this.search_details[peerId]};
-
-        }
-
-        this.find_db_peers = (db, options={
-            resolvePeerAddrs: {isNew: false, details: this.search_details[db.id]},
-            ipfs: {}
-        }) => {
-            if(peerSearches[db.id]) return false;
-            Logger.info(`Finding peers for ${db.id}`);
-            let search = ipfs.dht.findProvs(db.address.root, options.ipfs || {})
-            peerSearches[db.id] = {
-                started: Date.now(),
-                options: options,
-                search: search.then(async (results) => {
-                    if (options.resolvePeerAddrs) {
-                        let addrs = await Promise.all(results.map((p) => {
-                            resolvePeerAddr(p.id.toB58String())
-                        }));
-                        Logger.debug(`Found peer addrs ${addrs}`)
-                    } else {
-                        dbPeers[db.id] = results
-                    }
-                    db.events.emit('peers.found', {event:'peers.found', data:{peers:dbPeers[db.id]}})
-                    Logger.info(`Finished finding peers for ${db.id}`);
-                    delete peerSearches[db.id]
-                    return dbPeers[db.id]
-                }).catch((err) => {
-                    delete peerSearches[db.id]
-                    Logger.info(`Error while finding peers for ${db.id}`, err);
-                })
-            }
-            return true;
-        }
-
-        this.get_db_peers = (db) => {
-            return dbPeers[db.id].map(p => {
-                return {
-                    id: p.id.toB58String(),
-                    multiaddrs: p.multiaddrs.toArray().map(m=>m.toString())
-                }
-            })
-        }
-
-        this.get_peers = () => {
-            return Object.values(peersList).map(p => {
-                return {
-                    id: p.id.toB58String(),
-                    multiaddrs: p.multiaddrs.toArray().map(m=>m.toString())
-                }
-            })
-        }
-
-
-        function ipfsPeerConnected(swarm_peers, peerAddr) {
-            if (swarmFindPeer(swarm_peers, peerAddr)) {
-              return true;
-            }
-            return false;
-        }
-
-        function swarmFindPeer(swarm_peers, peerAddr) {
-            for (let peerInfo of swarm_peers) {
-                if (peerAddr.includes(peerInfo.peer.toB58String())) {
-                    return peerInfo;
-                }
-            }
-        }
-
-        function ipfsPing(peerInfo) {
-            peerId = peerInfo.id.toB58String();
-            ipfs.ping(peerId, function(err, _responses) {
-                if (err) {
-                    Logger.trace(`Error pinging ${peerId}`, err);
-                }
-            });
-          }
     }
 }
 

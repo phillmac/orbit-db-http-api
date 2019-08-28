@@ -1,22 +1,19 @@
-const IpfsApi   = require('ipfs-http-client');
-const OrbitDB   = require('orbit-db');
-const DBManager = require('../lib/db-manager.js')
-const OrbitApi  = require('../lib/orbitdb-api.js')
+const IpfsApi       = require('ipfs-http-client');
+const OrbitDB       = require('orbit-db');
+const DBManager     = require('../lib/db-manager.js')
+const PeerManager   = require('../lib/peer-manager.js')
+const OrbitDBApi    = require('../lib/orbitdb-api.js')
 
 
-async function api_factory(ipfs_host, ipfs_port, orbitdb_dir, orbitdb_opts, server_opts) {
-    let ipfs
-    let orbitdb
-    let dbm
-    let orbitdb_api
+async function apiFactory(options) {
 
-    if (orbitdb_dir) orbitdb_opts = Object.assign({'directory': orbitdb_dir}, orbitdb_opts)
-    ipfs        = new IpfsApi(ipfs_host, ipfs_port)
-    orbitdb     = await OrbitDB.createInstance(ipfs, orbitdb_opts)
-    dbm         = new DBManager(orbitdb, ipfs, {announceDBS: true})
-    orbitdb_api = new OrbitApi(dbm, server_opts)
+    const ipfs        = new IpfsApi(options.ipfs)
+    const orbitDB     = await OrbitDB.createInstance(ipfs, options.orbitDB)
+    const peerMan     = new PeerManager(ipfs, options.peerMan)
+    const dbM         = new DBManager(orbitDB, ipfs, peerMan)
+    const orbitDBAPI  = new OrbitDBApi(dbM, peerMan, options)
 
-    return orbitdb_api
+    return orbitDBAPI
 }
 
-module.exports = api_factory
+module.exports = apiFactory

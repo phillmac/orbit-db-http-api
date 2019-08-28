@@ -1,39 +1,34 @@
-const Ipfs      = require('ipfs');
-const OrbitDB   = require('orbit-db');
-const DBManager = require('../lib/db-manager.js')
-const OrbitApi  = require('../lib/orbitdb-api.js')
+const Ipfs          = require('ipfs');
+const OrbitDB       = require('orbit-db');
+const DBManager     = require('../lib/db-manager.js')
+const PeerManager   = require('../lib/peer-manager.js')
+const OrbitDBApi    = require('../lib/orbitdb-api.js')
+const merge         = require('lodash/merge')
 
 
-async function api_factory(ipfs_opts, orbitdb_dir, orbitdb_opts, server_opts) {
-    let ipfs, orbitdb, dbm, orbitdb_api, ipfs_defaults
+async function apiFactory(options) {
 
-    ipfs_defaults = {
-        EXPERIMENTAL: {
-            pubsub: true
+    options = merge({
+        ipfs: {
+            EXPERIMENTAL: {
+                pubsub: true
+            },
+            start: true
         },
-        start: true,
-        config: {
-                Addresses: {
-                Swarm: [
-                '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-webrtc-star',
-                '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star',
-                ]
-            }
-        }
-    }
-    if (orbitdb_dir) orbitdb_opts = Object.assign({'directory': orbitdb_dir}, orbitdb_opts)
-    ipfs_opts   = Object.assign(ipfs_defaults, ipfs_opts)
-    ipfs        = await new Promise((resolve, reject) => {
-        var node = new Ipfs(ipfs_opts)
-        node.on("ready", () => {
-          resolve(node)
-        })
-      }).catch((ex) => {throw ex})
-    orbitdb     = await OrbitDB.createInstance(ipfs, orbitdb_opts)
-    dbm         = new DBManager(orbitdb, ipfs, {announceDBS: true})
-    orbitdb_api = new OrbitApi(dbm, server_opts)
+    }, options)
 
-    return orbitdb_api
+    const ipfs = await new Promise((resolve, reject) => {
+        var node = new Ipfs(options.ipfs)
+        node.on("ready", () => {
+            resolve(node)
+        })
+    }).catch((err) => {throw err})
+    const orbitDB     = await OrbitDB.createInstance(ipfs, options.orbitDB)
+    const peerMan     = new PeerManager(ipfs, options.peerMan)
+    const dbM         = new DBManager(orbitDB, ipfs, peerMan)
+    const orbitDBAPI  = new OrbitDBApi(dbM, peerMan, options)
+
+    return orbitDBAPI
 }
 
-module.exports = api_factory
+module.exports = apiFactory
