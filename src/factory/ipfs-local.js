@@ -30,7 +30,7 @@ async function apiFactory (options) {
 
   const orbitDB = await OrbitDB.createInstance(ipfs, options.orbitDB)
   const peerMan = new PeerManager(ipfs, options.peerMan)
-  const dbM = new DBManager(orbitDB, ipfs, peerMan)
+  const dbM = new DBManager(orbitDB, peerMan)
   const orbitDBAPI = new OrbitDBApi(dbM, peerMan, options)
 
   dbmPromise.resolve(dbM)
