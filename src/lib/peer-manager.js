@@ -42,7 +42,7 @@ class PeerManager {
     this.getSearches = () => Object.keys(peerSearches).map(k => searchDetails(k))
 
     const resolvePeerAddr = async (peerId) => {
-      if (peerSearches[peerId]) return { isNew: false, details: searchDetails[peerId] }
+      if (peerSearches[peerId]) return { isNew: false, details: searchDetails(peerId) }
       Logger.info(`Resolving addrs for ${peerId}`)
       const search = ipfs.dht.findPeer(peerId)
       peerSearches[peerId] = {
@@ -57,7 +57,7 @@ class PeerManager {
           Logger.info(`Error while resolving addrs for ${peerId}`, err)
         })
       }
-      return { isNew: true, details: searchDetails[peerId] }
+      return { isNew: true, details: searchDetails(peerId) }
     }
 
     this.findDBPeers = (db, opts = {}) => {
