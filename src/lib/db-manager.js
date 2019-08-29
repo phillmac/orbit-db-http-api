@@ -1,7 +1,7 @@
 const Logger = require('js-logger')
 
 class DBManager {
-  constructor (orbitdb, ipfs, peerMan, options = {}) {
+  constructor (orbitdb,  peerMan) {
     const dbs = {}
 
     const findDB = (dbn) => {
