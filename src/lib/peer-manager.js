@@ -33,8 +33,8 @@ class PeerManager {
     const searchDetails = (searchID) => {
       return {
         searchID: searchID,
-        started: peerSearches[searchID].started,
-        options: peerSearches[searchID].options
+        started: peerSearches[searchID] && peerSearches[searchID].started || '',
+        options: peerSearches[searchID] && peerSearches[searchID].options || {}
       }
     }
     this.searchDetails = searchDetails
@@ -57,16 +57,16 @@ class PeerManager {
           Logger.info(`Error while resolving addrs for ${peerId}`, err)
         })
       }
-      return { isNew: true, details: searchDetails[peerId] || {} }
+      return { isNew: true, details: searchDetails[peerId] }
     }
 
-    this.findDBPeers = (db, options = {}) => {
+    this.findDBPeers = (db, opts = {}) => {
       if (peerSearches[db.id]) return { isNew: false, details: searchDetails[db.id] }
       Logger.info(`Finding peers for ${db.id}`)
-      const search = ipfs.dht.findProvs(db.address.root, options || {})
+      const search = ipfs.dht.findProvs(db.address.root, opts || {})
       peerSearches[db.id] = {
         started: Date.now(),
-        options: options,
+        options: opts,
         search: search.then(async (results) => {
           dbPeers[db.id] = results
           db.events.emit('peers.found', { event: 'peers.found', data: { peers: getDBPeers(db) } })
@@ -78,7 +78,7 @@ class PeerManager {
           Logger.info(`Error while finding peers for ${db.id}`, err)
         })
       }
-      return { isNew: true, details: (searchDetails[db.id] || {}) }
+      return { isNew: true, details: (searchDetails[db.id]) }
     }
 
     const getDBPeers = (db) => {
