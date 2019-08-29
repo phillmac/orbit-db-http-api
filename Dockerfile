@@ -1,4 +1,4 @@
-FROM node:11.13.0
+FROM node:12
 #tiny-secp256k1 barfs on any higher version
 
 RUN mkdir api
