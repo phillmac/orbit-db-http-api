@@ -61,7 +61,7 @@ class PeerManager {
     }
 
     this.findDBPeers = (db, opts = {}) => {
-      if (peerSearches[db.id]) return { isNew: false, details: searchDetails[db.id] }
+      if (peerSearches[db.id]) return { isNew: false, details: searchDetails(db.id) }
       Logger.info(`Finding peers for ${db.id}`)
       const search = ipfs.dht.findProvs(db.address.root, opts || {})
       peerSearches[db.id] = {
@@ -78,7 +78,7 @@ class PeerManager {
           Logger.info(`Error while finding peers for ${db.id}`, err)
         })
       }
-      return { isNew: true, details: (searchDetails[db.id]) }
+      return { isNew: true, details: searchDetails(db.id) }
     }
 
     const getDBPeers = (db) => {
