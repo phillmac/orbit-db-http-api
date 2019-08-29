@@ -25,7 +25,7 @@ class OrbitdbAPI {
         return h.continue
       }
       Logger.error(response)
-      if (this.options.orbitDBAPI.apiDebug) {
+      if (options.orbitDBAPI.apiDebug) {
         response.output.payload.message = String(response)
       }
       return response
