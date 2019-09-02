@@ -1,5 +1,5 @@
 const Hapi = require('hapi')
-const Boom = require('boom')
+const Boom = require('@hapi/boom')
 const Http2 = require('http2')
 const Susie = require('susie')
 const Logger = require('js-logger')
