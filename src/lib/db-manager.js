@@ -5,18 +5,14 @@ class DBManager {
     const dbs = {}
 
     const findDB = (dbn) => {
-      let result
       if (dbn in dbs) return dbs[dbn]
       for (const db of Object.values(dbs)) {
         if (dbn === db.id) {
-          result = db
-          break
+          return db
         } else if (dbn === [db.address.root, db.address.path].join('/')) {
-          result = db
-          break
+          return db
         }
       };
-      return result
     }
 
     this.get = async (dbn, params) => {
