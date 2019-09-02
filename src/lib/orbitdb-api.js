@@ -272,7 +272,7 @@ class OrbitdbAPI {
         path: '/db/{dbname}/access/write',
         handler: dbMiddleware(async (db, request, _h) =>
           {
-            result = await db.access.grant('write', request.payload.id)
+            const result = await db.access.grant('write', request.payload.id)
             if (result === false) {
               return Boom.notImplemented('Access controller does not support setting write access')
             }
