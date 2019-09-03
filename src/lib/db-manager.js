@@ -89,7 +89,7 @@ class DBManager {
           type: db.access.type || 'custom',
           write: write,
           capabilities: (db.access.hasOwnProperty('capabilities') && db.access.capabilities || {} ),
-          address :  (db.access.hasOwnProperty('address ') && db.access.address  || '' )
+          address:  db.access.address
         },
         peers: dbPeers,
         peerCount: dbPeers.length,
