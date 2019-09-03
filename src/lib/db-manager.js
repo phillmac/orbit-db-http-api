@@ -82,7 +82,7 @@ class DBManager {
         type: db.type,
         uid: db.uid,
         indexLength: db.index.length || Object.keys(db.index).length,
-        accessControlerType: db.access.type || 'custom',
+        accessControllerType: db.access.type || 'custom',
         peers: dbPeers,
         peerCount: dbPeers.length,
         capabilities: Object.keys( // TODO: cleanup this mess once tc39 object.fromEntries aproved
