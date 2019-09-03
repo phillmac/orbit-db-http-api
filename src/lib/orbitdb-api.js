@@ -283,7 +283,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/access/write/list',
-        handler: dbMiddleware(async (db, _request, _h) => db.access.write)
+        handler: dbMiddleware(async (db, _request, _h) => dbM.dbWrite(db))
       },
       {
         method: 'GET',
