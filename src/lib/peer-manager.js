@@ -10,23 +10,31 @@ class PeerManager {
 
     options.dbmPromise.then((dbmInstance) => { dbM = dbmInstance })
 
-    const announceDBS = async (dbs) => {
+    const announceDBs = async (dbs) => {
       Logger.info('Announcing DBs')
       for (const db of Object.values(dbs)) {
-        try {
-          await ipfs.dht.provide(new CID(db.address.root))
-          Logger.info('Finished announcing DBs')
-        } catch (ex) {
-          Logger.trace('Error while announcing DBs', ex)
-        }
+          await announceDB(db)
       }
+      Logger.info('Finished announcing DBs')
+  }
+
+  this.announceDBs = announceDBs
+
+  const announceDB = async (db) => {
+    Logger.info(`Announcing ${db.address.id}`)
+    try {
+      await ipfs.dht.provide(new CID(db.address.root))
+      Logger.info(`Finished announcing ${db.address.id}`)
+    } catch (ex) {
+      Logger.trace('Error while announcing DB', ex)
     }
+  }
 
-    this.announceDBS = announceDBS
+  this.announceDB = announceDB
 
-    if (options.announceDBS) {
+    if (options.announceDBs) {
       setInterval(function () {
-        announceDBS(dbM.dbs())
+        announceDBs(dbM.dbs())
       }, options.announceInterval || 1800000)
     }
 
@@ -41,7 +49,8 @@ class PeerManager {
 
     this.getSearches = () => Object.keys(peerSearches).map(k => searchDetails(k))
 
-    const resolvePeerAddr = async (peerId) => {
+    const resolvePeerAddrs = async (peerInfo) => {
+      const peerId = getPeerID(peerInfo)
       if (peerSearches[peerId]) return { isNew: false, details: searchDetails(peerId) }
       Logger.info(`Resolving addrs for ${peerId}`)
       const search = ipfs.dht.findPeer(peerId)
@@ -147,6 +156,38 @@ class PeerManager {
       })
     }
   }
+
+  //  getPeerAddresses = (peerInfo) => {
+  //   for (const getAddrsMethod  of [
+  //     () => peerInfo.multiaddrs.toArray().map(m => m.toString())
+  //   ]) {
+
+  //   }
+  // }
+
+  // getPeerID = (peerInfo) => {
+  //   if (typeof peerInfo === 'string') {
+  //     return peerInfo
+  //   } else if (peerInfo.id && typeof peerInfo.id.toB58String === 'function'){
+  //     return peerInfo.id.toB58String()
+  //   } else {
+  //     throw new Error(`Uknown peerInfo ${typeof peerInfo}`)
+  //   }
+  // }
+
+  // connectPeer = async (peerInfo)  => {
+  //   const peerAddresses = getPeerAddresses(peerInfo)
+  //   const peerId = getPeerID(peerInfo)
+
+  //   Logger.info(`Connecting ipfs peer: ${peerId}`)
+  //   for (const address of peerAddresses )
+  //   try {
+  //     await ipfs.swarm.connect(address)
+  //   } catch (ex) {
+  //     Logger.trace(`Unable to connect ${address}: ${ex}`)
+  //   }
+  //   Logger.info(`Connected ${peerId}`)
+  // }
 }
 
 module.exports = PeerManager

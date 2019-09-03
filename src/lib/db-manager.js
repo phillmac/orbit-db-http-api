@@ -54,8 +54,8 @@ class DBManager {
     }
 
   const canAppend = (writeList) => {
-    if (orbitdb.identity.id in writeList) return true
-    if (typeof writeList.includes === 'function' && writeList.includes(orbitdb.identity.id)) return true
+    if (orbitDB.identity.id in writeList) return true
+    if (typeof writeList.includes === 'function' && writeList.includes(orbitDB.identity.id)) return true
     return false
   }
 
