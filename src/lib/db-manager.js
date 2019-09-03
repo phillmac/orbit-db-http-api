@@ -88,7 +88,7 @@ class DBManager {
         accessController: {
           type: db.access.type || 'custom',
           write: write,
-          capabilities: (db.access.hasOwnProperty('capabilities') && db.access.capabilities || {} ),
+          capabilities: db.access.capabilities,
           address:  db.access.address
         },
         peers: dbPeers,
