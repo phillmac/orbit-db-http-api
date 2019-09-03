@@ -1,7 +1,7 @@
 const Logger = require('js-logger')
 
 class DBManager {
-  constructor (orbitdb,  peerMan) {
+  constructor (orbitDB,  peerMan) {
     const dbs = {}
 
     const findDB = (dbn) => {
@@ -21,7 +21,7 @@ class DBManager {
         return db
       } else {
         Logger.info(`Opening db ${dbn}`)
-        db = await orbitdb.open(dbn, params)
+        db = await orbitDB.open(dbn, params)
         Logger.info(`Loading db ${dbn}`)
         await db.load()
         Logger.info(`Loaded db ${db.dbname}`)
@@ -53,6 +53,13 @@ class DBManager {
       )
     }
 
+  const canAppend = (writeList) => {
+    if (orbitdb.identity.id in writeList) return true
+    if (typeof writeList.includes === 'function' && writeList.includes(orbitdb.identity.id)) return true
+    return false
+  }
+
+
     this.dbWrite = (dbn) => {
       const db = findDB(dbn)
       if (!db) return {}
@@ -77,7 +84,7 @@ class DBManager {
           path: db.options.path,
           replicate: db.options.replicate
         },
-        canAppend: write.includes(orbitdb.identity.id),
+        canAppend: canAppend(write),
         write: write,
         type: db.type,
         uid: db.uid,
@@ -104,7 +111,7 @@ class DBManager {
     this.dbInfo = dbInfo
 
     this.identity = () => {
-      return orbitdb.identity
+      return orbitDB.identity
     }
   }
 }
