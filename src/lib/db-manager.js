@@ -86,11 +86,15 @@ class DBManager {
           replicate: db.options.replicate
         },
         canAppend: canAppend(write),
-        write: write,
         type: db.type,
         uid: db.uid,
         indexLength: db.index.length || Object.keys(db.index).length,
-        accessControllerType: db.access.type || 'custom',
+        accessController: {
+          type: db.access.type || 'custom',
+          write: write,
+          capabilities: (db.access.hasOwnProperty('capabilities') && db.access.capabilities || {} ),
+          address :  (db.access.hasOwnProperty('address ') && db.access.address  || '' )
+        },
         peers: dbPeers,
         peerCount: dbPeers.length,
         capabilities: Object.keys( // TODO: cleanup this mess once tc39 object.fromEntries aproved
@@ -107,6 +111,7 @@ class DBManager {
           )
         )
       }
+
     }
 
     this.dbInfo = dbInfo
