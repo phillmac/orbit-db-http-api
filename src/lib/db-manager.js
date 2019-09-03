@@ -61,11 +61,7 @@ class DBManager {
   }
 
 
-    this.dbWrite = (dbn) => {
-      const db = findDB(dbn)
-      if (!db) return {}
-      return dbWrite(db)
-    }
+    this.dbWrite = dbWrite
 
     const dbInfo = (dbn) => {
       const db = findDB(dbn)
