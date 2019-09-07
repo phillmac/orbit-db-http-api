@@ -177,7 +177,9 @@ class OrbitdbAPI {
                 method: ['POST', 'PUT'],
                 path: '/db/{dbname}/inc',
                 handler: dbMiddleware( async (db, request, _h) => {
-                    return {hash: await db.inc(parseInt(request.payload.val || 1))};
+                    let incval
+                    incval = parseInt(request.payload ? request.payload.val || 1 : 1);
+                    return {hash: await db.inc(incval)};
                 })
             },
             {
