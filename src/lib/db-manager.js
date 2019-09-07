@@ -50,9 +50,25 @@ class DBManager {
             return JSON.stringify(db_info_list);
         };
 
+        let _db_write = (db) => {
+            return (
+                db.access.write ||
+                (typeof db.access.get == 'function' && db.access.get('write')) ||
+                db.access._options.write ||
+                'unavaliable'
+            );
+        }
+
+        this.db_write = (dbn) => {
+            let db = find_db(dbn);
+            if (!db) return {};
+            return _db_write(db);
+        }
+
         this.db_info = (dbn) => {
             let db = find_db(dbn);
             if (!db) return {};
+            let __db_write = _db_write(db)
             return {
                 address: db.address,
                 dbname: db.dbname,
@@ -66,8 +82,12 @@ class DBManager {
                     path: db.options.path,
                     replicate: db.options.replicate,
                 },
+                canAppend: __db_write.includes(orbitdb.identity.id),
+                write: __db_write,
                 type: db.type,
                 uid: db.uid,
+                indexLength: db.index.length || Object.keys(db.index).length,
+                accessControlerType: db.access.type || 'custom',
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
                         Object.entries({

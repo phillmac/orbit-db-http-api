@@ -177,7 +177,9 @@ class OrbitdbAPI {
                 method: ['POST', 'PUT'],
                 path: '/db/{dbname}/inc',
                 handler: dbMiddleware( async (db, request, _h) => {
-                    return {hash: await db.inc(parseInt(request.payload.val || 1))};
+                    let incval
+                    incval = parseInt(request.payload ? request.payload.val || 1 : 1);
+                    return {hash: await db.inc(incval)};
                 })
             },
             {
@@ -188,7 +190,7 @@ class OrbitdbAPI {
                 })
             },
             {
-                method: 'GET',
+                method: 'POST',
                 path: '/db/{dbname}/query',
                 handler: dbMiddleware( async (db, request, _h) => {
                     let qparams, comparison, query;
@@ -263,7 +265,7 @@ class OrbitdbAPI {
                 method: ['POST', 'PUT'],
                 path: '/db/{dbname}/access/write',
                 handler: dbMiddleware( async (db, request, _h) => {
-                    await db.access.grant('write', request.payload.publicKey)
+                    await db.access.grant('write', request.payload.id)
                     return {};
                 })
             },
