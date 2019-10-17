@@ -24,7 +24,7 @@ stages:
       displayName: Build an image
       inputs:
         containerRegistry: 'OrbitDB Docker Hub'
-        repository: 'orbitdb/orbit-db-http-api-dev'
+        repository: 'phillmac/orbit-db-http-api-dev'
         command: 'build'
         Dockerfile: '**/Dockerfile'
         tags: |
@@ -33,7 +33,7 @@ stages:
       displayName: Push image
       inputs:
         containerRegistry: 'OrbitDB Docker Hub'
-        repository: 'orbitdb/orbit-db-http-api-dev'
+        repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
           latest
