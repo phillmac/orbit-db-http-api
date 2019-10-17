@@ -10,7 +10,7 @@ class PeerManager {
     if (typeof options.PeerInfo !== 'function') {throw new Error('options.PeerInfo must be callable')}
     if (typeof options.multiaddr !== 'function') {throw new Error('options.multiaddr must be callable')}
 
-    const peerManOptions = Object.assign({}, options.peerMan)
+    const peerManOptions = Object.assign({}, isDefined(options.peerMan) ? options.peerMan : options)
     const PeerBook = options.PeerBook
     const dbPeers = {}
     const peerSearches = {}
