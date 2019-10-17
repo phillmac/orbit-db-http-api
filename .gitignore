@@ -66,3 +66,6 @@ typings/
 
 # ignore local db repository
 orbitdb/
+
+#azure-pipelines
+azure-pipelines.yml
