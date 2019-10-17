@@ -3,7 +3,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- debug
+- develop
 
 resources:
 - repo: self
@@ -28,7 +28,7 @@ stages:
         command: 'build'
         Dockerfile: '**/Dockerfile'
         tags: |
-          debug
+          develop
     - task: Docker@2
       displayName: Push image
       inputs:
@@ -36,4 +36,4 @@ stages:
         repository: 'orbitdb/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          debug
+          develop
