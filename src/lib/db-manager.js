@@ -34,7 +34,7 @@ class DBManager {
 
     this.dbs = () => Object.values(orbitDB.stores)
 
-    this.dbList = () => Object.keys(orbitDB.stores).map((dbn) => dbInfo(dbn))
+    this.dbList = () => Object.values(orbitDB.stores).map((db) => dbInfo(db))
 
     const dbWrite = (db) => {
       return (
@@ -54,8 +54,7 @@ class DBManager {
       return false
     }
 
-    const dbInfo = (dbn) => {
-      const db = findDB(dbn)
+    const dbInfo = (db) => {
       if (!db) return {}
       const write = dbWrite(db)
       const dbPeers = (typeof getPeers === 'function' && getPeers(db)) || []
@@ -94,7 +93,7 @@ class DBManager {
             query: typeof db.query === 'function',
             remove: typeof (db.del || db.remove) === 'function',
             value: typeof db.value === 'function'
-          }).filter(([k, v]) => v).map(([k, v]) => ({ [k]: v }))
+          }).filter(([_k, v]) => v).map(([k, v]) => ({ [k]: v }))
           )
         )
       }

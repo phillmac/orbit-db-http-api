@@ -128,7 +128,7 @@ class OrbitdbAPI {
         handler: async (request, _h) => {
           const payload = request.payload
           const db = await dbM.get(payload.dbname, payload)
-          return dbM.dbInfo(db.dbname)
+          return dbM.dbInfo(db)
         }
       },
       {
@@ -136,13 +136,13 @@ class OrbitdbAPI {
         path: '/db/{dbname}',
         handler: async (request, _h) => {
           const db = await dbM.get(request.params.dbname, request.payload)
-          return dbM.dbInfo(db.dbname)
+          return dbM.dbInfo(db)
         }
       },
       {
         method: 'GET',
         path: '/db/{dbname}',
-        handler: (request, _h) => dbM.dbInfo(request.params.dbname)
+        handler: dbMiddleware(async (db, _request, _h) => dbM.dbInfo(db))
       },
       {
         method: 'DELETE',
