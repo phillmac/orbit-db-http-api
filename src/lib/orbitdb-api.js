@@ -310,13 +310,13 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/peers',
-        handler: dbManiddleware((db, _request, _h) => peerMan.getDBPeers(db))
+        handler: dbManiddleware((db, _request, _h) => peerMan.getPeers(db))
       },
 
       {
         method: 'GET',
         path: '/peers',
-        handler: (_request, _h) => peerMan.getPeers()
+        handler: (_request, _h) => peerMan.allPeers()
       },
 
       {
