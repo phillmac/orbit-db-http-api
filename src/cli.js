@@ -93,14 +93,14 @@ async function init () {
         apiDebug: Boolean(apiDebug),
         logger
       },
+      multiaddr,
+      PeerBook,
+      PeerInfo,
       peerMan: {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
         dbAnnounce: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(dbAnnounce),
-        logger,
-        multiaddr,
-        PeerBook,
-        PeerInfo
+        logger
       },
       server: {
         hapi: {
