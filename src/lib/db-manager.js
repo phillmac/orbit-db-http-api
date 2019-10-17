@@ -1,8 +1,13 @@
 const isDefined = (arg) => arg !== undefined && arg !== null
 
 class DBManager {
-  constructor (orbitDB, getPeers, attachDB) {
+  constructor (orbitDB, peerMan) {
     if (!isDefined(orbitDB)) { throw new Error('orbitDB is a required argument.') }
+
+    peerMan = Object.assign({
+      getPeers: function() {},
+      attachDB: function() {}
+    }, peerMan)
 
     const findDB = (dbn) => {
       if (dbn in orbitDB.stores) return orbitDB.stores[dbn]
@@ -20,12 +25,8 @@ class DBManager {
       if (db) {
         return db
       } else {
-        logger.info(`Opening db ${dbn}`)
         db = await orbitDB.open(dbn, params)
-        logger.info(`Loading db ${dbn}`)
         await db.load()
-        logger.info(`Loaded db ${db.dbname}`)
-        orbitDB.stores[db.dbname] = db
         if (typeof attachDB === 'function') attachDB(db)
         return db
       }
