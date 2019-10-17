@@ -25,7 +25,7 @@ async function apiFactory (options) {
   }).catch((err) => { throw err })
 
   const orbitDB = await OrbitDB.createInstance(ipfs, options.orbitDB)
-  const peerMan = new PeerManager(ipfs, options)
+  const peerMan = new PeerManager(ipfs, orbitDB, options)
   const dbM = new DBManager(orbitDB, peerMan)
   const orbitDBAPI = new OrbitDBApi(dbM, peerMan, options)
 

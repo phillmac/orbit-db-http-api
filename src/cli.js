@@ -93,9 +93,6 @@ async function init () {
         apiDebug: Boolean(apiDebug),
         logger
       },
-      multiaddr,
-      PeerBook,
-      PeerInfo,
       peerMan: {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
@@ -115,7 +112,14 @@ async function init () {
       }
     }
 
-    options = merge(options || {}, cliOptions)
+    options = merge(options || {},
+      {
+        multiaddr,
+        PeerBook,
+        PeerInfo,
+      },
+       cliOptions
+    )
 
     if (!options.server.http2.certFile) throw new Error('--https-cert is required')
     if (!options.server.http2.certKeyFile) throw new Error('--https-key is required')
