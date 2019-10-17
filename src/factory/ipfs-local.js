@@ -4,6 +4,8 @@ const DBManager = require('../lib/db-manager.js')
 const PeerManager = require('../lib/peer-manager.js')
 const OrbitDBApi = require('../lib/orbitdb-api.js')
 const EmptyPromise = require('empty-promise')
+const Logger = require('logplease')
+
 
 const merge = require('lodash/merge')
 

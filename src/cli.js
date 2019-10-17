@@ -3,18 +3,12 @@
 const fs = require('fs')
 const { docopt } = require('docopt')
 const version = require('../package.json').version
-const Logger = require('js-logger')
+const Logger = require('logplease')
 const localApiFactory = require('./factory/ipfs-local.js')
 const remoteApiFactory = require('./factory/ipfs-api.js')
 const merge = require('lodash/merge')
 
-Logger.useDefaults({
-  defaultLevel: Logger.TRACE,
-  formatter: function (messages, _context) {
-    const d = new Date()
-    messages.unshift(`${d.toLocaleDateString()} ${d.toLocaleTimeString()}`)
-  }
-})
+
 
 class Cli {
   constructor () {
@@ -29,11 +23,12 @@ Usage:
 
 Options:
     --debug                         Enable api debug response on error
-    --https-port=HTTPS_PORT             Listen for api calls on API_PORT
+    --api-port=API_PORT             Listen for api calls on API_PORT
     --orbitdb-dir=ORBITDB_DIR       Store orbit-db files in ORBITDB_DIR
     --config=CONFIG                 Load orbit-db conf options from ORBITDB_CONF
     --https-cert=HTTPS_CERT         Path to https cert
     --https-key=HTTPS_KEY           Path to https cert key
+    --http1-enable                  Enable HTTP1.X connections to api
     --announce-dbs=ANNOUNCE_DBS     Announce dbs to dht (requires --ipfs-dht in local mode)
 `
     this._args = docopt(doc, {
@@ -64,9 +59,10 @@ async function init () {
 
     const ipfsMode = (args.api && 'api') || (args.local && 'local')
     const orbitDBDir = args['--orbitdb-dir'] || process.env.ORBITDB_DIR
-    const httpsPort = args['--https-port'] || process.env.HTTPS_PORT
+    const apiPort = args['--api-port'] || process.env.API_PORT
     const certFile = args['--https-cert'] || process.env.HTTPS_CERT
     const certKeyFile = args['--https-key'] || process.env.HTTPS_KEY
+    const allowHTTP1 = args['--http1-enable'] || process.env.ALLOW_HTTP1
     const ipfsHost = args['--ipfs-host'] || process.env.IPFS_HOST
     const ipfsPort = args['--ipfs-port'] || process.env.IPFS_PORT
     const ipfsDHT = args['--ipfs-dht'] || process.env.IPFS_DHT
@@ -97,11 +93,15 @@ async function init () {
         dbAnnounce: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(dbAnnounce)
       },
       server: {
-        httpsPort: httpsPort,
+        hapi: {
+          port: apiPort,
+          tls: true,
+        },
         http2: {
+          allowHTTP1: Boolean(allowHTTP1),
           certKeyFile: certKeyFile,
           certFile: certFile
-        }
+        },
       }
     }
 
@@ -109,7 +109,7 @@ async function init () {
 
     if (!options.server.http2.certFile) throw new Error('--https-cert is required')
     if (!options.server.http2.certKeyFile) throw new Error('--https-key is required')
-    if (!options.server.httpsPort) options.server.httpsPort = 3000
+    if (!options.server.hapi.port) options.server.hapi.port = 3000
     if (dbAnnounce && ipfsMode === 'local' && (!ipfsDHT)) {
       Logger.warn('DB announcing disabled due to IPFS DHT not enabled')
     }

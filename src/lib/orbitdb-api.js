@@ -13,11 +13,10 @@ class OrbitdbAPI {
     }
 
     const listener = Http2.createSecureServer(options.server.http2)
-    this.server = new Hapi.Server({
-      listener,
-      tls: true,
-      port: options.server.httpsPort
-    })
+    this.server = new Hapi.Server(Object.assign(
+        options.server.hapi,
+        {listener}
+    ))
 
     this.server.ext('onPreResponse', (request, h) => {
       const response = request.response

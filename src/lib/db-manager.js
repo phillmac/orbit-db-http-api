@@ -1,18 +1,18 @@
-const Logger = require('js-logger')
+const isDefined = (arg) => arg !== undefined && arg !== null
 
 class DBManager {
-  constructor (orbitDB,  peerMan) {
-    const dbs = {}
+  constructor (orbitDB, getPeers, attachDB) {
+    if (!isDefined(orbitDB)) { throw new Error('orbitDB is a required argument.') }
 
     const findDB = (dbn) => {
-      if (dbn in dbs) return dbs[dbn]
-      for (const db of Object.values(dbs)) {
+      if (dbn in orbitDB.stores) return orbitDB.stores[dbn]
+      for (const db of Object.values(orbitDB.stores)) {
         if (dbn === db.id) {
           return db
-        } else if (dbn === [db.address.root, db.address.path].join('/')) {
+        } else if (dbn === db.address.toString) {
           return db
         }
-      };
+      }
     }
 
     this.get = async (dbn, params) => {
@@ -20,54 +20,44 @@ class DBManager {
       if (db) {
         return db
       } else {
-        Logger.info(`Opening db ${dbn}`)
+        logger.info(`Opening db ${dbn}`)
         db = await orbitDB.open(dbn, params)
-        Logger.info(`Loading db ${dbn}`)
+        logger.info(`Loading db ${dbn}`)
         await db.load()
-        Logger.info(`Loaded db ${db.dbname}`)
-        dbs[db.dbname] = db
+        logger.info(`Loaded db ${db.dbname}`)
+        orbitDB.stores[db.dbname] = db
+        if (typeof attachDB === 'function') attachDB(db)
         return db
       }
     }
 
-    this.dbRemove = async (dbn) => {
-      const db = findDB(dbn)
-      if (db) {
-        await db.close()
-        delete dbs[db.dbname]
-        peerMan.removeDB(db)
-        Logger.info(`Unloaded db ${db.dbname}`)
-      }
-    }
+    this.dbs = () => Object.values(orbitDB.stores)
 
-    this.dbs = () => Object.values(dbs)
-
-    this.dbList = () => Object.keys(dbs).map((dbn) => dbInfo(dbn))
+    this.dbList = () => Object.keys(orbitDB.stores).map((dbn) => dbInfo(dbn))
 
     const dbWrite = (db) => {
       return (
-        db.access.write ||
-                (typeof db.access.get === 'function' && db.access.get('write')) ||
-                db.access._options.write ||
-                'unavaliable'
+        (typeof db.access.write !== 'undefined' && db.access.write) ||
+        (typeof db.access.get === 'function' && db.access.get('write')) ||
+        (typeof db.access._options === 'object' && db.access._options.write) ||
+        'undefined'
       )
     }
 
-  const canAppend = (writeList) => {
-    if (orbitDB.identity.id in writeList) return true
-    if (typeof writeList.has === 'function' && writeList.has(orbitDB.identity.id)) return true
-    if (typeof writeList.includes === 'function' && writeList.includes(orbitDB.identity.id)) return true
-    return false
-  }
-
-
     this.dbWrite = dbWrite
+
+    const canAppend = (writeList) => {
+      if (orbitDB.identity.id in writeList) return true
+      if (typeof writeList.has === 'function' && writeList.has(orbitDB.identity.id)) return true
+      if (typeof writeList.includes === 'function' && writeList.includes(orbitDB.identity.id)) return true
+      return false
+    }
 
     const dbInfo = (dbn) => {
       const db = findDB(dbn)
       if (!db) return {}
       const write = dbWrite(db)
-      const dbPeers = peerMan.getDBPeers(db)
+      const dbPeers = (typeof getPeers === 'function' && getPeers(db)) || []
       return {
         address: db.address,
         dbname: db.dbname,
@@ -89,11 +79,11 @@ class DBManager {
           type: db.access.type || 'custom',
           write: write,
           capabilities: db.access.capabilities,
-          address:  db.access.address
+          address: db.access.address
         },
         peers: dbPeers,
         peerCount: dbPeers.length,
-        capabilities: Object.keys( // TODO: cleanup this mess once tc39 object.fromEntries aproved
+        capabilities: Object.keys( // TODO: cleanup this mess once tc39 Object.fromEntries aproved, Nodejs version 12
           Object.assign({}, ...Object.entries({
             add: typeof db.add === 'function',
             get: typeof db.get === 'function',
@@ -107,7 +97,6 @@ class DBManager {
           )
         )
       }
-
     }
 
     this.dbInfo = dbInfo
@@ -118,4 +107,4 @@ class DBManager {
   }
 }
 
-module.exports = DBManager
+if (typeof module === 'object') module.exports = DBManager
