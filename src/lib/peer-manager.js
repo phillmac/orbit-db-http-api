@@ -3,20 +3,20 @@ const isDefined = (arg) => arg !== undefined && arg !== null
 class PeerManager {
   constructor(ipfs, orbitDB, options = {}) {
 
-    if (!isDefined(options.peerInfo)) {throw new Error('options.peerInfo is a required argument.')}
-    if (!isDefined(options.multiAddr)) {throw new Error('options.multiAddr is a required argument.')}
-    if (!isdefined(options.peerBook)) {throw new Error('options.peerBook is a required argument.')}
+    if (!isDefined(options.PeerInfo)) {throw new Error('options.PeerInfo is a required argument.')}
+    if (!isDefined(options.multiaddr)) {throw new Error('options.multiaddr is a required argument.')}
+    if (!isdefined(options.PeerBook)) {throw new Error('options.PeerBook is a required argument.')}
 
-    if (typeof options.peerInfo !== 'function') {throw new Error('options.peerInfo must be callable')}
-    if (typeof options.multiAddr !== 'function') {throw new Error('options.multiAddr must be callable')}
+    if (typeof options.PeerInfo !== 'function') {throw new Error('options.PeerInfo must be callable')}
+    if (typeof options.multiaddr !== 'function') {throw new Error('options.multiaddr must be callable')}
 
     const peerManOptions = Object.assign({}, options.peerMan)
-    const PeerBook = options.peerBook
+    const PeerBook = options.PeerBook
     const dbPeers = {}
     const peerSearches = {}
     const peersList = typeof PeerBook === 'function' ? new PeerBook() : PeerBook
-    const PeerInfo = options.peerInfo
-    const MultiAddr = options.multiAddr
+    const PeerInfo = options.PeerInfo
+    const multiaddr = options.multiaddr
 
     const logger = Object.assign(
       {
@@ -124,7 +124,7 @@ class PeerManager {
       if (isDefined(details.Addrs)) {
         for(addr of details.Addrs) {
           details.Addrs.forEach(addr => {
-            result.multiaddrs.add(MultiAddr(addr))
+            result.multiaddrs.add(multiaddr(addr))
           })
         }
       }

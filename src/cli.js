@@ -8,6 +8,10 @@ const localApiFactory = require('./factory/ipfs-local.js')
 const remoteApiFactory = require('./factory/ipfs-api.js')
 const merge = require('lodash/merge')
 
+const PeerInfo = require('peer-info')
+const multiaddr = require('multiaddr')
+const PeerBook = require('peer-book')
+
 
 
 class Cli {
@@ -93,7 +97,10 @@ async function init () {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
         dbAnnounce: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(dbAnnounce),
-        logger
+        logger,
+        multiaddr,
+        PeerBook,
+        PeerInfo
       },
       server: {
         hapi: {
