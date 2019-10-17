@@ -155,7 +155,7 @@ async function init () {
     }
 
     await orbitDBAPI.server.start()
-    logger.info(`Server running on port ${options.server.httpsPort}`)
+    logger.info(`Server running on port ${options.server.hapi.port}`)
   } catch (err) {
     logger.error(err)
     process.exit(1)
