@@ -147,10 +147,10 @@ class OrbitdbAPI {
       {
         method: 'DELETE',
         path: '/db/{dbname}',
-        handler: async (request, _h) => {
-          await dbM.dbListRemove(request.params.dbname)
+        handler: dbMiddleware(async (db, _request, _h) => {
+          await peerMan.detachDB(db)
+          await db.close()
           return {}
-        }
       },
       {
         method: 'DELETE',

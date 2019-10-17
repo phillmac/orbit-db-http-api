@@ -229,7 +229,7 @@ class PeerManager {
       })
     }).bind(this)
 
-    this.removeDB = (db => {
+    this.detachDB = (db => {
       if (peerSearches[db.id]) {
         peerSearches[db.id].search.then(() => {
           delete dbPeers[db.id]
