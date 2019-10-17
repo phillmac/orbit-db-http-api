@@ -42,6 +42,7 @@ Options:
 }
 
 async function init () {
+  const logger = Logger.create('orbit-db-http-api-cli')
   let options
   let orbitDBAPI
 
@@ -111,10 +112,10 @@ async function init () {
     if (!options.server.http2.certKeyFile) throw new Error('--https-key is required')
     if (!options.server.hapi.port) options.server.hapi.port = 3000
     if (dbAnnounce && ipfsMode === 'local' && (!ipfsDHT)) {
-      Logger.warn('DB announcing disabled due to IPFS DHT not enabled')
+      logger.warn('DB announcing disabled due to IPFS DHT not enabled')
     }
 
-    Logger.debug(`Options: ${JSON.stringify(options, null, 4)}`)
+    logger.debug(`Options: ${JSON.stringify(options, null, 4)}`)
 
     options = merge(options, {
       server: {
@@ -141,9 +142,9 @@ async function init () {
     }
 
     await orbitDBAPI.server.start()
-    Logger.info(`Server running on port ${options.server.httpsPort}`)
+    logger.info(`Server running on port ${options.server.httpsPort}`)
   } catch (err) {
-    Logger.error(err)
+    logger.error(err)
     process.exit(1)
   }
 }
