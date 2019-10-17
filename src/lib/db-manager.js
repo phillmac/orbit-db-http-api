@@ -92,7 +92,7 @@ class DBManager {
             put: typeof db.put === 'function',
             query: typeof db.query === 'function',
             remove: typeof (db.del || db.remove) === 'function',
-            value: typeof db.value === 'function'
+            value: typeof db.value === 'number'
           }).filter(([_k, v]) => v).map(([k, v]) => ({ [k]: v }))
           )
         )
