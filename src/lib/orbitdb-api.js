@@ -84,21 +84,23 @@ class OrbitdbAPI {
     const addEventListener = (db, eventName, request, h) => {
       const eventMap = new Map(Object.entries({
         replicated: (address) =>
-          h.event({ event: 'replicated', data: { address: address } }),
+          h.event({event: 'replicated', data: {address}}),
         replicate: (address) =>
-          h.event({ event: 'replicate', data: { address: address } }),
+          h.event({event: 'replicate', data: {address}}),
         'replicate.progress': (address, hash, entry, progress, have) =>
-          h.event({ event: 'replicate.progress', data: { address: address, hash: hash, entry: entry, progress: progress, have: have } }),
+          h.event({event: 'replicate.progress', data:{address,hash,entry,progress,have}}),
         load: (dbname) =>
-          h.event({ event: 'load', data: { dbname: dbname } }),
+          h.event({ event: 'load', data: {dbname}}),
         'load.progress': (address, hash, entry, progress, total) =>
-          h.event({ event: 'load.progress', data: { address: address, hash: hash, entry: entry, progress: progress, total: total } }),
+          h.event({event: 'load.progress', data: {address, hash, entry, progress, total}}),
         ready: (dbname, heads) =>
-          h.event({ event: 'ready', data: { dbname: dbname, heads: heads } }),
+          h.event({event: 'ready', data: {dbname, heads}}),
         write: (dbname, hash, entry) =>
-          h.event({ event: 'write', data: { dbname: dbname, hash: hash, entry: entry } }),
+          h.event({event: 'write', data: {dbname, hash, entry}}),
         closed: (dbname) =>
-          h.event({ event: 'closed', data: { dbname: dbname } })
+          h.event({event: 'closed', data: {dbname}}),
+        peer: (peer) =>
+          h.event({event: 'peer', data: {peer}})
       }))
 
       const eventCallback = eventMap.get(eventName)
