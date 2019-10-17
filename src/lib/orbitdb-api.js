@@ -6,7 +6,7 @@ const Susie = require('susie')
 require('events').EventEmitter.defaultMaxListeners = 50 // Set warning higher then normal to handle many clients
 
 class OrbitdbAPI {
-  constructor (dbM, peerMan, options) {
+  constructor (dbMan, peerMan, options) {
     const orbitdbAPIOptions = Object.assign({}, options.orbitDBAPI)
 
     const logger = Object.assign(
@@ -54,9 +54,9 @@ class OrbitdbAPI {
       all: () => true
     }
 
-    const dbMiddleware = fn =>
+    const dbManiddleware = fn =>
       async (request, h) => {
-        const db = await dbM.get(request.params.dbname)
+        const db = await dbMan.get(request.params.dbname)
         return Promise.resolve((fn(db, request, h)))
           .catch((err) => { throw err })
       }
@@ -120,34 +120,34 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/dbs',
-        handler: (_request, _h) => dbM.dbList()
+        handler: (_request, _h) => dbMan.dbList()
       },
       {
         method: ['POST', 'PUT'],
         path: '/db',
         handler: async (request, _h) => {
           const payload = request.payload
-          const db = await dbM.get(payload.dbname, payload)
-          return dbM.dbInfo(db)
+          const db = await dbMan.get(payload.dbname, payload)
+          return dbMan.dbInfo(db)
         }
       },
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}',
         handler: async (request, _h) => {
-          const db = await dbM.get(request.params.dbname, request.payload)
-          return dbM.dbInfo(db)
+          const db = await dbMan.get(request.params.dbname, request.payload)
+          return dbMan.dbInfo(db)
         }
       },
       {
         method: 'GET',
         path: '/db/{dbname}',
-        handler: dbMiddleware(async (db, _request, _h) => dbM.dbInfo(db))
+        handler: dbManiddleware(async (db, _request, _h) => dbMan.dbInfo(db))
       },
       {
         method: 'DELETE',
         path: '/db/{dbname}',
-        handler: dbMiddleware(async (db, _request, _h) => {
+        handler: dbManiddleware(async (db, _request, _h) => {
           await peerMan.detachDB(db)
           await db.close()
           return {}
@@ -156,7 +156,7 @@ class OrbitdbAPI {
       {
         method: 'DELETE',
         path: '/db/{dbname}/{item}',
-        handler: dbMiddleware(async (db, request, _h) => {
+        handler: dbManiddleware(async (db, request, _h) => {
           if (db.del) {
             return { hash: await db.del(request.params.item) }
           } else if (db.remove) {
@@ -173,7 +173,7 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/put',
-        handler: dbMiddleware(async (db, request, _h) => {
+        handler: dbManiddleware(async (db, request, _h) => {
           const params = request.payload
 
           if (db.type === 'keyvalue') {
@@ -192,14 +192,14 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/add',
-        handler: dbMiddleware(async (db, request, _h) => {
+        handler: dbManiddleware(async (db, request, _h) => {
           return { hash: await db.add(request.payload) }
         })
       },
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc',
-        handler: dbMiddleware(async (db, request, _h) => {
+        handler: dbManiddleware(async (db, request, _h) => {
           const incval = parseInt(request.payload ? request.payload.val || 1 : 1)
           return { hash: await db.inc(incval) }
         })
@@ -207,14 +207,14 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc/{val}',
-        handler: dbMiddleware(async (db, request, _h) => {
+        handler: dbManiddleware(async (db, request, _h) => {
           return { hash: await db.inc(parseInt(request.params.val || 1)) }
         })
       },
       {
         method: 'POST',
         path: '/db/{dbname}/query',
-        handler: dbMiddleware(async (db, request, _h) => {
+        handler: dbManiddleware(async (db, request, _h) => {
           logger.debug('Query reqest payload', request.payload)
           const qparams = request.payload
           const comparison = comparisons[qparams.comp || 'all']
@@ -225,7 +225,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/iterator',
-        handler: dbMiddleware(async (db, request, h) => {
+        handler: dbManiddleware(async (db, request, h) => {
           const raw = rawIterator(db, request, h)
           return raw.map((e) => Object.keys(e.payload.value)[0])
         })
@@ -233,21 +233,21 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/rawiterator',
-        handler: dbMiddleware(async (db, request, h) => {
+        handler: dbManiddleware(async (db, request, h) => {
           return rawIterator(db, request, h)
         })
       },
       {
         method: 'GET',
         path: '/db/{dbname}/raw/{item}',
-        handler: dbMiddleware(async (db, request, h) => {
+        handler: dbManiddleware(async (db, request, h) => {
           return getRaw(db, request, h)
         })
       },
       {
         method: 'GET',
         path: '/db/{dbname}/{item}',
-        handler: dbMiddleware(async (db, request, h) => {
+        handler: dbManiddleware(async (db, request, h) => {
           const raw = getRaw(db, request, h)
           return unpackContents(raw)
         })
@@ -255,7 +255,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/all',
-        handler: dbMiddleware(async (db, _request, _h) => {
+        handler: dbManiddleware(async (db, _request, _h) => {
           if (typeof db._query === 'function') {
             const contents = db._query({ limit: -1 })
             return contents.map((e) => Object.keys(e.payload.value)[0])
@@ -267,22 +267,22 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/index',
-        handler: dbMiddleware(async (db, _request, _h) => db.index)
+        handler: dbManiddleware(async (db, _request, _h) => db.index)
       },
       {
         method: 'GET',
         path: '/db/{dbname}/value',
-        handler: dbMiddleware(async (db, _request, _h) => db.value)
+        handler: dbManiddleware(async (db, _request, _h) => db.value)
       },
       {
         method: 'GET',
         path: '/identity',
-        handler: (_request, _h) => dbM.identity()
+        handler: (_request, _h) => dbMan.identity()
       },
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/access/write',
-        handler: dbMiddleware(async (db, request, _h) =>
+        handler: dbManiddleware(async (db, request, _h) =>
           {
             const result = await db.access.grant('write', request.payload.id)
             if (result === false) {
@@ -295,12 +295,12 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/access/write/list',
-        handler: dbMiddleware(async (db, _request, _h) => dbM.dbWrite(db))
+        handler: dbManiddleware(async (db, _request, _h) => dbMan.dbWrite(db))
       },
       {
         method: 'GET',
         path: '/db/{dbname}/events/{eventname}',
-        handler: dbMiddleware(async (db, request, h) => {
+        handler: dbManiddleware(async (db, request, h) => {
           const events = request.params.eventname.split(',')
           events.forEach((eventName) => addEventListener(db, eventName, request, h))
           return h.event({ event: 'registered', data: { eventnames: events } })
@@ -310,7 +310,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/peers',
-        handler: dbMiddleware((db, _request, _h) => peerMan.getDBPeers(db))
+        handler: dbManiddleware((db, _request, _h) => peerMan.getDBPeers(db))
       },
 
       {
@@ -328,7 +328,7 @@ class OrbitdbAPI {
       {
         method: 'POST',
         path: '/peers/searches/db/{dbname}',
-        handler: dbMiddleware((db, request, _h) => peerMan.findDBPeers(db, request.payload))
+        handler: dbManiddleware((db, request, _h) => peerMan.findDBPeers(db, request.payload))
       }
 
     ])
