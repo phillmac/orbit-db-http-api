@@ -42,7 +42,7 @@ Options:
 }
 
 async function init () {
-  const logger = Logger.create('orbit-db-http-api-cli')
+  const logger = Logger.create('orbit-db-http-api')
   let options
   let orbitDBAPI
 
@@ -86,12 +86,14 @@ async function init () {
         directory: orbitDBDir
       },
       orbitDBAPI: {
-        apiDebug: Boolean(apiDebug)
+        apiDebug: Boolean(apiDebug),
+        logger
       },
       peerMan: {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
-        dbAnnounce: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(dbAnnounce)
+        dbAnnounce: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(dbAnnounce),
+        logger
       },
       server: {
         hapi: {
