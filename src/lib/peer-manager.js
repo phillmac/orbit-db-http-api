@@ -246,10 +246,10 @@ class PeerManager {
       dbPeers[db.id][peer.id.toB58String()] = peer
     })
 
-    async function peerHandler(peerIDStr) {
+    const peerHandler = (async (peerIDStr) => {
       const peer = await this.resolvePeerId(peerIDStr)
       addPeer(db, peer)
-    }
+    }).bind(this)
 
     this.attachDB = (db => {
       db.events.on("peer", peerHandler)
