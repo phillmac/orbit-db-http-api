@@ -5,7 +5,7 @@ class PeerManager {
 
     if (!isDefined(options.PeerInfo)) {throw new Error('options.PeerInfo is a required argument.')}
     if (!isDefined(options.multiaddr)) {throw new Error('options.multiaddr is a required argument.')}
-    if (!isdefined(options.PeerBook)) {throw new Error('options.PeerBook is a required argument.')}
+    if (!isDefined(options.PeerBook)) {throw new Error('options.PeerBook is a required argument.')}
 
     if (typeof options.PeerInfo !== 'function') {throw new Error('options.PeerInfo must be callable')}
     if (typeof options.multiaddr !== 'function') {throw new Error('options.multiaddr must be callable')}
