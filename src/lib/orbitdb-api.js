@@ -151,6 +151,7 @@ class OrbitdbAPI {
           await peerMan.detachDB(db)
           await db.close()
           return {}
+        })
       },
       {
         method: 'DELETE',
