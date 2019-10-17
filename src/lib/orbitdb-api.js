@@ -2,14 +2,26 @@ const Hapi = require('hapi')
 const Boom = require('@hapi/boom')
 const Http2 = require('http2')
 const Susie = require('susie')
-const Logger = require('js-logger')
 
 require('events').EventEmitter.defaultMaxListeners = 50 // Set warning higher then normal to handle many clients
 
 class OrbitdbAPI {
   constructor (dbM, peerMan, options) {
-    if (options.orbitDBAPI.apiDebug) {
-      Logger.info('Debug enabled')
+    const orbitdbAPIOptions = Object.assign({}, options.orbitDBAPI)
+
+    const logger = Object.assign(
+      {
+        debug: function() {},
+        info: function() {},
+        warn: function() {},
+        error: function() {}
+      },
+      options.logger,
+      orbitdbAPIOptions.logger
+    )
+
+    if (orbitdbAPIOptions.apiDebug) {
+      logger.info('Debug enabled')
     }
 
     const listener = Http2.createSecureServer(options.server.http2)
@@ -23,7 +35,7 @@ class OrbitdbAPI {
       if (!response.isBoom) {
         return h.continue
       }
-      Logger.error(response)
+      logger.error(response)
       if (options.orbitDBAPI.apiDebug) {
         response.output.payload.message = String(response)
       }
@@ -202,7 +214,7 @@ class OrbitdbAPI {
         method: 'POST',
         path: '/db/{dbname}/query',
         handler: dbMiddleware(async (db, request, _h) => {
-          Logger.debug('Query reqest payload', request.payload)
+          logger.debug('Query reqest payload', request.payload)
           const qparams = request.payload
           const comparison = comparisons[qparams.comp || 'all']
           const query = (doc) => comparison(doc[qparams.propname || '_id'], ...qparams.values)
