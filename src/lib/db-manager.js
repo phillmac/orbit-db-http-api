@@ -74,7 +74,7 @@ class DBManager {
         canAppend: canAppend(write),
         type: db.type,
         uid: db.uid,
-        indexLength: db.index.length || Object.keys(db.index).length,
+        indexLength: db.index ? (db.index.length || Object.keys(db.index).length) : 0,
         accessController: {
           type: db.access.type || 'custom',
           write: write,
