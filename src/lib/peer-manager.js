@@ -236,7 +236,6 @@ class PeerManager {
         })
       } else {
         delete dbPeers[db.id]
-        db.events.removeListener("peer", peerHandler)
       }
     }).bind(this)
 
@@ -246,13 +245,14 @@ class PeerManager {
       dbPeers[db.id][peer.id.toB58String()] = peer
     })
 
-    const peerHandler = (async (peerIDStr) => {
-      const peer = await this.resolvePeerId(peerIDStr)
-      addPeer(db, peer)
-    }).bind(this)
+ 
 
     this.attachDB = (db => {
-      db.events.on("peer", peerHandler)
+      db.events.on("peer", function (peer) {
+        logger.debug(`peer event: ${peer}`)
+        const peer = await this.resolvePeerId(peerIDStr)
+        addPeer(db, peer)
+      })
     }).bind(this)
   }
 }
