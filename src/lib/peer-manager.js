@@ -312,7 +312,6 @@ class PeerManager {
     this.attachDB = (db) => {
       db.events.on('peer', async function (peerID) {
         const peer = await swarmFindPeer(peerID)
-        logger.debug(peer)
         logger.debug(`Resolved peer from event ${peer.id.toB58String()}`)
         addPeer(db, peer)
       })
