@@ -37,6 +37,9 @@ const MakeQuerablePromise = (promise) => {
 
 class PeerManager {
   constructor (ipfs, orbitDB, options = {}) {
+    if (!isDefined(options.PeerId)) {
+      throw new Error('options.PeerId is a required argument.')
+    }
     if (!isDefined(options.PeerInfo)) {
       throw new Error('options.PeerInfo is a required argument.')
     }
@@ -47,6 +50,9 @@ class PeerManager {
       throw new Error('options.PeerBook is a required argument.')
     }
 
+    if (typeof options.PeerId !== 'function') {
+      throw new Error('options.PeerId must be callable')
+    }
     if (typeof options.PeerInfo !== 'function') {
       throw new Error('options.PeerInfo must be callable')
     }
@@ -59,6 +65,7 @@ class PeerManager {
     const dbPeers = {}
     const peerSearches = {}
     const peersList = typeof PeerBook === 'function' ? new PeerBook() : PeerBook
+    const PeerId = options.PeerId
     const PeerInfo = options.PeerInfo
     const multiaddr = options.multiaddr
 
@@ -148,9 +155,9 @@ class PeerManager {
     const createPeerInfo = (details) => {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
       let result
-      if (isDefined(details.ID)) {
+      if (typeof details.ID === 'string' ) {
         logger.debug(details.ID)
-        result = PeerInfo.create(details.ID)
+        result = PeerInfo.create(PeerId.createFromB58String(details.ID))
       } else {
         throw new Error('Unhandled createPeerInfo', details) // Peer id property is something other then 'ID'
       }

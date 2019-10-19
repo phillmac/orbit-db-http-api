@@ -8,6 +8,7 @@ const localApiFactory = require('./factory/ipfs-local.js')
 const remoteApiFactory = require('./factory/ipfs-api.js')
 const merge = require('lodash/merge')
 
+const PeerId = require('peer-id')
 const PeerInfo = require('peer-info')
 const multiaddr = require('multiaddr')
 const PeerBook = require('peer-book')
@@ -112,11 +113,12 @@ async function init () {
       }
     }
 
-    options = merge(options || {},
+    options = merge({}, options,
       {
         multiaddr,
         PeerBook,
-        PeerInfo,
+        PeerId,
+        PeerInfo
       },
        cliOptions
     )
