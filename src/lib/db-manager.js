@@ -12,9 +12,9 @@ class DBManager {
     const findDB = (dbn) => {
       if (dbn in orbitDB.stores) return orbitDB.stores[dbn]
       for (const db of Object.values(orbitDB.stores)) {
-        if (dbn === db.id) {
+        if (dbn === db.dbname) {
           return db
-        } else if (dbn === db.address.toString) {
+        } else if (dbn === db.address.toString()) {
           return db
         }
       }
