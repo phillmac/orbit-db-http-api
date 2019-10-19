@@ -118,7 +118,10 @@ class PeerManager {
 
       let result
 
-      while (Object.keys(resolved).some(p => p.isPending()) && !result) {
+      while (Object.keys(resolved).some(function(p) {
+        logger.info(p)
+        return p.isPending()
+      }) && !result) {
         result = await Promise.race(resolved.filter(p => p.isPending()))
       }
 
