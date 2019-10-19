@@ -228,20 +228,27 @@ class PeerManager {
             result.on('data', chunk => {
               if (chunk.Type === 4) {
                 logger.debug(`Found peers from DHT: ${JSON.stringify(chunk)}`)
-                peers = peers.concat(chunk.Responses.map(r => createPeerInfo(r)))
+                newPeers = chunk.Responses.map(r => createPeerInfo(r))
+                for (const peer of newPeers) {
+                  addPeer(db, peer)
+                }
+                peers = peers.concat(newPeers)
               }
             })
           }
           )
         })
       } else {
-        search = ipfs.dht.findProvs(db.address.root, opts || {})
+        search = ipfs.dht.findProvs(db.address.root, opts || {}).then(peers => {
+          for (const peer of peers) {
+            addPeer(db, peer)
+          }
+          return peers
+        })
       }
       search.then(peers => {
         logger.info(`Finished finding peers for ${db.id}`)
-        for (const peer of peers) {
-          peersList.put(peer, false)
-        }
+        return peers
       }).catch(err => {
         logger.warn(`Error while finding peers for ${db.id}`, err)
       }).finally (() => {
