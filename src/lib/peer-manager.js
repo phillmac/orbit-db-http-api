@@ -152,7 +152,7 @@ class PeerManager {
 
     this.resolvePeerId = resolvePeerId.bind(this)
 
-    const createPeerInfo = (details) => {
+    const createPeerInfo = async (details) => {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
       let result
       let peerID
@@ -162,7 +162,7 @@ class PeerManager {
       } else {
         throw new Error('Unhandled createPeerInfo', details) // Peer id property is something other then 'ID'
       }
-      result = PeerInfo.create(peerID)
+      result = new PeerInfo(peerID)
 
       if (isDefined(details.Addrs)) {
         for (const addr of details.Addrs) {
