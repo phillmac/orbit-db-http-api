@@ -235,7 +235,7 @@ class PeerManager {
         }
       }).catch(err => {
         logger.warn(`Error while finding peers for ${db.id}`, err)
-      }).finaly(() => {
+      }).finally (() => {
         delete peerSearches[db.id]
       })
       peerSearches[db.id] = {
