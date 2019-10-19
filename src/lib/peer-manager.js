@@ -88,7 +88,7 @@ class PeerManager {
           logger.debug(err)
         }
       })()
-      const p2 = resolvePeerAddrs(peerIDStr).search.then(details => {
+      const p2 = resolvePeerAddrs(peerID).search.then(details => {
         resolved[p2] = true
         return details
       })
