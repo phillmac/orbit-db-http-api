@@ -90,10 +90,10 @@ class PeerManager {
     this.announceDBs = announceDBs
 
     const announceDB = async (db) => {
-      logger.info(`Announcing ${db.address.id}`)
+      logger.info(`Announcing ${db.address.toString()}`)
       try {
         await ipfs.dht.provide(db.address.root)
-        logger.info(`Finished announcing ${db.address.id}`)
+        logger.info(`Finished announcing ${db.address.toString()}`)
       } catch (err) {
         logger.warn('Error while announcing DB', err)
       }
