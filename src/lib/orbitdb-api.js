@@ -125,6 +125,12 @@ class OrbitdbAPI {
         handler: (_request, _h) => dbMan.dbList()
       },
       {
+        method: 'GET',
+        path: '/dbs/announce',
+        handler: (_request, _h) => peerMan.announceDBs()
+      },
+
+      {
         method: ['POST', 'PUT'],
         path: '/db',
         handler: async (request, _h) => {
@@ -145,6 +151,11 @@ class OrbitdbAPI {
         method: 'GET',
         path: '/db/{dbname}',
         handler: dbMiddleware(async (db, _request, _h) => dbMan.dbInfo(db))
+      },
+      {
+        method: ['POST', 'PUT'],
+        path: '/db/{dbname}/announce',
+        handler: dbMiddleware(async (db, _request, _h) => peerMan.announceDB(db))
       },
       {
         method: 'DELETE',
@@ -308,35 +319,30 @@ class OrbitdbAPI {
           return h.event({ event: 'registered', data: { eventnames: events } })
         })
       },
-
       {
         method: 'GET',
         path: '/db/{dbname}/peers',
         handler: dbMiddleware((db, _request, _h) => peerMan.getPeers(db))
       },
-
       {
         method: 'GET',
         path: '/peers',
         handler: (_request, _h) => peerMan.allPeers()
       },
-
       {
         method: 'GET',
         path: '/peers/searches',
         handler: (_request, _h) => peerMan.getSearches()
       },
-
       {
         method: 'POST',
         path: '/peers/searches/db/{dbname}',
         handler: dbMiddleware((db, request, _h) => peerMan.findPeers(db, request.payload))
       },
-
       {
         method: 'POST',
         path: '/peers/searches/peer/{peerID}',
-        handler: peerMan.dhtFindPeer(request.params.peerID)
+        handler: (request, _h) => peerMan.dhtFindPeer(request.params.peerID)
       }
     ])
   }
