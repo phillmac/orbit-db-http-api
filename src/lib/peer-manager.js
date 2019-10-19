@@ -205,7 +205,7 @@ class PeerManager {
       logger.info(`Finding peers for ${db.id}`)
       if (
         typeof ipfs.send === 'function' &&
-                (peerManOptions.useCustomFindProvs || opts.useCustomFindProvs)
+                ((peerManOptions && peerManOptions.useCustomFindProvs) || (opts && opts.useCustomFindProvs))
       ) {
         logger.debug('Using custom findProvs')
         search = new Promise((resolve, reject) => {
