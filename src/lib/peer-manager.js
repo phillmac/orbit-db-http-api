@@ -79,9 +79,9 @@ class PeerManager {
     peerManOptions.logger
     )
 
-    const announceDBs = async (dbs) => {
+    const announceDBs = async () => {
       logger.info('Announcing DBs')
-      for (const db of Object.values(dbs)) {
+      for (const db of Object.values(orbitDB.stores)) {
         await announceDB(db)
       }
       logger.info('Finished announcing DBs')
