@@ -4,10 +4,10 @@ class DBManager {
   constructor (orbitDB, peerMan) {
     if (!isDefined(orbitDB)) { throw new Error('orbitDB is a required argument.') }
 
-    peerMan = Object.assign({
+    /* peerMan = Object.assign({
       getPeers: function() {},
       attachDB: function() {}
-    }, peerMan)
+    }, peerMan) */
 
     const findDB = (dbn) => {
       if (dbn in orbitDB.stores) return orbitDB.stores[dbn]
