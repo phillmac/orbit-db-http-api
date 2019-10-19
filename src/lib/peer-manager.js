@@ -104,18 +104,19 @@ class PeerManager {
       if (peerID.toB58String) peerID = peerID.toB58String()
 
       const resolved = [
-        MakeQuerablePromise((async () => {
+        MakeQuerablePromise(new Promise((resolve, reject) => {
           try {
             const swarmPeers = await ipfs.swarm.addrs()
             for (const PeerInfo of swarmPeers) {
               if (peerID.includes(PeerInfo.id.toB58String())) {
-                return PeerInfo
+                resolve(PeerInfo)
               }
             }
           } catch (err) {
             logger.debug(err)
+            reject(err)
           }
-        })()),
+        })),
         MakeQuerablePromise(resolvePeerAddrs(peerID).search)
       ]
 
