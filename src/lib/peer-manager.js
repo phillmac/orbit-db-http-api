@@ -219,6 +219,7 @@ class PeerManager {
             result.on('end', () => resolve(peers))
             result.on('data', chunk => {
               if (chunk.Type === 4) {
+                logger.debug(`Found peer from DHT: ${peer}`)
                 peers = peers.concat(chunk.Responses.map(r => createPeerInfo(r)))
               }
             })
