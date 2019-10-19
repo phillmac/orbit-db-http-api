@@ -190,7 +190,7 @@ class PeerManager {
         typeof ipfs.send === 'function' &&
         (peerManOptions.useCustomFindProvs || opts.useCustomFindProvs)
       ) {
-        console.debug('Using custom findProvs')
+        logger.debug('Using custom findProvs')
         search = new Promise((resolve, reject) => {
           ipfs.send(
             {
