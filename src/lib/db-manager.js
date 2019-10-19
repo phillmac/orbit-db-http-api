@@ -27,7 +27,7 @@ class DBManager {
       } else {
         db = await orbitDB.open(dbn, params)
         await db.load()
-        if (typeof attachDB === 'function') attachDB(db)
+        if (typeof peerMan.attachDB === 'function') peerMan.attachDB(db)
         return db
       }
     }
@@ -57,7 +57,7 @@ class DBManager {
     const dbInfo = (db) => {
       if (!db) return {}
       const write = dbWrite(db)
-      const dbPeers = (typeof getPeers === 'function' && getPeers(db)) || []
+      const dbPeers = (typeof peerMan.getPeers === 'function' && (peerMan.getPeers(db)) || [])
       return {
         address: db.address,
         dbname: db.dbname,
