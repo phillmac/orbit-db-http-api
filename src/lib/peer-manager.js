@@ -155,7 +155,7 @@ class PeerManager {
       return result
     }
 
-    const resolvePeerAddrs = async peerIDStr => {
+    const resolvePeerAddrs = peerIDStr => {
       if (peerSearches[peerIDStr]) {
         return {
           isNew: false,
