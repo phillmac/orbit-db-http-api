@@ -125,7 +125,7 @@ class OrbitdbAPI {
         handler: (_request, _h) => dbMan.dbList()
       },
       {
-        method: 'GET',
+        method: ['POST', 'PUT'],
         path: '/dbs/announce',
         handler: (_request, _h) => peerMan.announceDBs()
       },
