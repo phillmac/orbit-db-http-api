@@ -114,6 +114,7 @@ class PeerManager {
         options: (peerSearches[searchID] && peerSearches[searchID].options) || {}
       }
     }
+
     this.searchDetails = searchDetails
 
     this.getSearches = () =>
