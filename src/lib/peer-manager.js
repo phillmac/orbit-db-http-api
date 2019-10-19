@@ -57,7 +57,7 @@ class PeerManager {
       peerManOptions.logger
     )
 
-    const announceDBs = async dbs => {
+    const announceDBs = async (dbs) => {
       logger.info('Announcing DBs')
       for (const db of Object.values(dbs)) {
         await announceDB(db)
@@ -67,7 +67,7 @@ class PeerManager {
 
     this.announceDBs = announceDBs
 
-    const announceDB = async db => {
+    const announceDB = async (db) => {
       logger.info(`Announcing ${db.address.id}`)
       try {
         await ipfs.dht.provide(db.address.root)
@@ -132,7 +132,7 @@ class PeerManager {
 
     this.resolvePeerId = resolvePeerId.bind(this)
 
-    const createPeerInfo = details => {
+    const createPeerInfo = (details) => {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
       let result
       if (isDefined(details.ID)) {
@@ -249,7 +249,7 @@ class PeerManager {
       })
     }
 
-    this.detachDB = db => {
+    this.removeDB = (db) => {
       if (peerSearches[db.id]) {
         peerSearches[db.id].search.then(() => {
           delete dbPeers[db.id]
@@ -266,7 +266,7 @@ class PeerManager {
       dbPeers[db.id][peer.id.toB58String()] = peer
     }
 
-    this.attachDB = db => {
+    this.attachDB = (db) => {
       db.events.on('peer', async function (peerID) {
         const peer = await resolvePeerId(peerID)
         logger.debug(`Resolved peer from event ${peer.id.toB58String()}`)
