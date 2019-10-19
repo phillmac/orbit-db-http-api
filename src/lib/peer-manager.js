@@ -124,7 +124,7 @@ class PeerManager {
       ipfs.swarm.addrs().then(swarmPeers => {
         for (const peer of swarmPeers) {
           if (peerIDStr.includes(peer.id.toB58String())) {
-            return peerInfo
+            return peer
           }
         }
       })
