@@ -4,10 +4,10 @@ class DBManager {
   constructor (orbitDB, peerMan) {
     if (!isDefined(orbitDB)) { throw new Error('orbitDB is a required argument.') }
 
-    /* peerMan = Object.assign({
+    peerMan = Object.assign({
       getPeers: function() {},
       attachDB: function() {}
-    }, peerMan) */
+    }, peerMan)
 
     const findDB = (dbn) => {
       if (dbn in orbitDB.stores) return orbitDB.stores[dbn]
@@ -27,7 +27,7 @@ class DBManager {
       } else {
         db = await orbitDB.open(dbn, params)
         await db.load()
-        if (typeof peerMan.attachDB === 'function') peerMan.attachDB(db)
+        if (typeof  peerMan.attachDB === 'function')  peerMan.attachDB(db)
         return db
       }
     }
@@ -57,7 +57,7 @@ class DBManager {
     const dbInfo = (db) => {
       if (!db) return {}
       const write = dbWrite(db)
-      const dbPeers = (typeof peerMan.getPeers === 'function' && (peerMan.getPeers(db)) || [])
+      const dbPeers = (typeof peerMan.getPeers === 'function' &&  peerMan.getPeers(db)) || []
       return {
         address: db.address,
         dbname: db.dbname,
