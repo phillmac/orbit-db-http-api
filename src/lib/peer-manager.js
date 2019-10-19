@@ -277,7 +277,7 @@ class PeerManager {
     this.getPeers = (db) => {
       if (!(db.id in dbPeers)) return []
       return dbPeers[db.id].map(p => {
-        peer = peersList.get(p)
+        const peer = peersList.get(p)
         return {
           id: peer.id.toB58String(),
           multiaddrs: peer.multiaddrs.toArray().map(m => m.toString())
