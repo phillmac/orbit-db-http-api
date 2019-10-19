@@ -106,9 +106,9 @@ class PeerManager {
       const resolved = [
         MakeQuerablePromise(new Promise((resolve, reject) => {
             ipfs.swarm.addrs().then(swarmPeers => {
-              for (const PeerInfo of swarmPeers) {
-                if (peerID.includes(PeerInfo.id.toB58String())) {
-                  resolve(PeerInfo)
+              for (const peerInfo of swarmPeers) {
+                if (peerID.includes(peerInfo.id.toB58String())) {
+                  resolve(peerInfo)
                 }
               }
             }).catch(err => reject(err))
