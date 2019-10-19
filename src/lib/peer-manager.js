@@ -119,38 +119,45 @@ class PeerManager {
     this.getSearches = () =>
       Object.keys(peerSearches).map(k => searchDetails(k))
 
+    const swarmFindPeer = async (peerIDStr) => {
+      ipfs.swarm.addrs().then(swarmPeers => {
+        for (const peer of swarmPeers) {
+          if (peerIDStr.includes(peer.id.toB58String())) {
+            return peerInfo
+          }
+        }
+      })
+    }
+
     const resolvePeerId = async (peerID) => {
+      let result
       if (PeerId.isPeerId(peerID)) peerID = peerID.toB58String()
-      if (peersList.has(peerID)) return peersList.get(peerID) // Short circuit
+      if (peersList.has(peerID)) return result // Short circuit
 
       const resolved = [
-        MakeQuerablePromise(new Promise((resolve, reject) => {
-          ipfs.swarm.addrs().then(swarmPeers => {
-            for (const peerInfo of swarmPeers) {
-              if (peerID.includes(peerInfo.id.toB58String())) {
-                resolve(peerInfo)
-              }
-            }
-          }).catch(err => reject(err))
+        MakeQuerablePromise(swarmFindPeer(peerID).then(function(peer){
+          peersList.put(peer, false)
+          return peer
         })),
-        MakeQuerablePromise(resolvePeerAddrs(peerID).search)
+        MakeQuerablePromise(dhtFindPeer(peerID).search)
       ]
 
-      let result
-
-      while (resolved.some(p => p.isPending()) && !result) {
+      while ((!result) && resolved.some(p => p.isPending())) {
+        try {
         result = await Promise.race(resolved.filter(p => p.isPending()))
+        } catch (err) {
+          logger.warn(err)
+        }
       }
 
       if (result) {
         const peerInfo = createPeerInfo(result)
-        peersList.put(peerInfo, false)
         return peerInfo
       }
       throw new Error(`Unable to resolve peer ${peerID}`)
     }
 
-    this.resolvePeerId = resolvePeerId.bind(this)
+    this.resolvePeerId = resolvePeerId
 
     const createPeerInfo = (details) => {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
@@ -170,7 +177,7 @@ class PeerManager {
       return peerInfo
     }
 
-    const resolvePeerAddrs = (peerIDStr) => {
+    const dhtFindPeer = (peerIDStr) => {
       if (peerSearches[peerIDStr]) {
         return {
           isNew: false,
@@ -181,8 +188,8 @@ class PeerManager {
       logger.info(`Resolving addrs for ${peerIDStr}`)
       const search = ipfs.dht
         .findPeer(peerIDStr)
-        .then(results => {
-          peersList[peerIDStr] = results
+        .then(result => {
+          peersList.put(result, false)
           delete peerSearches[peerIDStr]
           return results
         })
@@ -268,10 +275,11 @@ class PeerManager {
 
     this.getPeers = (db) => {
       if (!(db.id in dbPeers)) return []
-      return Object.values(dbPeers[db.id]).map(p => {
+      return dbPeers[db.id].map(p => {
+        peer = peersList.get(p)
         return {
-          id: p.id.toB58String(),
-          multiaddrs: p.multiaddrs.toArray().map(m => m.toString())
+          id: peer.id.toB58String(),
+          multiaddrs: peer.multiaddrs.toArray().map(m => m.toString())
         }
       })
     }
@@ -298,13 +306,13 @@ class PeerManager {
     const addPeer = (db, peer) => {
       if (!PeerInfo.isPeerInfo(peer)) peer = createPeerInfo(peer)
       peersList.put(peer, false)
-      if (!(db.id in dbPeers)) dbPeers[db.id] = {}
-      dbPeers[db.id][peer.id.toB58String()] = peer
+      if (!(db.id in dbPeers)) dbPeers[db.id] = []
+      dbPeers[db.id].push(peer.id.toB58String())
     }
 
     this.attachDB = (db) => {
       db.events.on('peer', async function (peerID) {
-        const peer = await resolvePeerId(peerID)
+        const peer = await swarmFindPeer(peerID)
         logger.debug(`Resolved peer from event ${peer.id.toB58String()}`)
         addPeer(db, peer)
       })
