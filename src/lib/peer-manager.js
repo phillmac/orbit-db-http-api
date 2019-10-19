@@ -103,9 +103,6 @@ class PeerManager {
       if (peersList.has(peerID)) return peersList.get(peerID) // Short circuit
       if (peerID.toB58String) peerID = peerID.toB58String()
 
-      const debug = resolvePeerAddrs(peerID)
-      logger.info(debug)
-      logger.info(debug.search)
       const resolved = [
         MakeQuerablePromise((async () => {
           try {
@@ -119,7 +116,7 @@ class PeerManager {
             logger.debug(err)
           }
         })()),
-        MakeQuerablePromise(debug.search)
+        MakeQuerablePromise(resolvePeerAddrs(peerID).search)
       ]
 
       let result
@@ -155,7 +152,7 @@ class PeerManager {
       return result
     }
 
-    const resolvePeerAddrs = peerIDStr => {
+    const resolvePeerAddrs = (peerIDStr) => {
       if (peerSearches[peerIDStr]) {
         return {
           isNew: false,
@@ -177,7 +174,6 @@ class PeerManager {
         })
       peerSearches[peerIDStr] = {
         started: Date.now(),
-        options: options,
         search
       }
       return { isNew: true, details: searchDetails(peerIDStr), search }
