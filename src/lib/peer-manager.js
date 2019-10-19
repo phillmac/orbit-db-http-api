@@ -177,7 +177,7 @@ class PeerManager {
     }
 
     const dhtFindPeer = (peerIDStr) => {
-      if (peerSearches[peerIDStr]) {
+      if (peerIDStr in peerSearches) {
         return {
           isNew: false,
           details: searchDetails(peerIDStr),
@@ -209,7 +209,7 @@ class PeerManager {
 
     this.findPeers = (db, opts = {}) => {
       let search
-      if (peerSearches[db.id]) {
+      if (db.id in peerSearches) {
         return {
           isNew: false,
           details: searchDetails(db.id),
@@ -223,25 +223,26 @@ class PeerManager {
       ) {
         logger.debug('Using custom findProvs')
         search = new Promise((resolve, reject) => {
-          ipfs.send({
-            path: 'dht/findprovs',
-            args: db.address.root
-          },
-          (err, result) => {
-            if (err) reject(err)
-            let peers = []
-            result.on('end', () => resolve(peers))
-            result.on('data', chunk => {
-              if (chunk.Type === 4) {
-                const newPeers = chunk.Responses.map(r => createPeerInfo(r))
-                logger.debug(`Found peers from DHT: ${JSON.stringify(chunk.Responses)}`)
-                for (const peer of newPeers) {
-                  addPeer(db, peer)
+          ipfs.send(
+            {
+              path: 'dht/findprovs',
+              args: db.address.root
+            },
+            (err, result) => {
+              if (err) reject(err)
+              let peers = []
+              result.on('end', () => resolve(peers))
+              result.on('data', chunk => {
+                if (chunk.Type === 4) {
+                  const newPeers = chunk.Responses.map(r => createPeerInfo(r))
+                  logger.debug(`Found peers from DHT: ${JSON.stringify(chunk.Responses)}`)
+                  for (const peer of newPeers) {
+                    addPeer(db, peer)
+                  }
+                  peers = peers.concat(newPeers)
                 }
-                peers = peers.concat(newPeers)
-              }
-            })
-          }
+              })
+            }
           )
         })
       } else {
