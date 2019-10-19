@@ -261,6 +261,7 @@ class PeerManager {
     const addPeer = (db, peer) => {
       if (!PeerInfo.isPeerInfo(peer)) peer = createPeerInfo(peer)
       peersList.put(peer, false)
+      if(!isDefined(dbPeers[db.id])) dbPeers[db.id] = {}
       dbPeers[db.id][peer.id.toB58String()] = peer
     }
 
