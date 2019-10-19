@@ -85,7 +85,7 @@ class PeerManager {
       }, peerManOptions.announceInterval || 1800000)
     }
 
-    const searchDetails = searchID => {
+    const searchDetails = (searchID) => {
       return {
         searchID: searchID,
         started:
