@@ -232,7 +232,7 @@ class PeerManager {
       search.then(peers => {
         logger.info(`Finished finding peers for ${db.id}`)
         for (const peer of peers) {
-          peersList.put(peer)
+          peersList.put(peer, false)
         }
       }).catch(err => {
         logger.warn(`Error while finding peers for ${db.id}`, err)
