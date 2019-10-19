@@ -133,7 +133,7 @@ class PeerManager {
     const resolvePeerId = async (peerID) => {
       let result
       if (PeerId.isPeerId(peerID)) peerID = peerID.toB58String()
-      if (peersList.has(peerID)) return result // Short circuit
+      if (peersList.has(peerID)) result = peersList.get(peerID) // Short circuit
 
       const resolved = [
         MakeQuerablePromise(swarmFindPeer(peerID).then(function(peer){
