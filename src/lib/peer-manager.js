@@ -155,12 +155,14 @@ class PeerManager {
     const createPeerInfo = (details) => {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
       let result
+      let peerID
+      if (PeerId.isPeerId(details)) return PeerInfo.create(details)
       if (typeof details.ID === 'string' ) {
-        logger.debug(details.ID)
-        result = PeerInfo.create(PeerId.createFromB58String(details.ID))
+        peerID = PeerId.createFromB58String(details.ID)
       } else {
         throw new Error('Unhandled createPeerInfo', details) // Peer id property is something other then 'ID'
       }
+      result = PeerInfo.create(peerID)
 
       if (isDefined(details.Addrs)) {
         for (const addr of details.Addrs) {
