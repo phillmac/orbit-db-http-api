@@ -71,7 +71,7 @@ class PeerManager {
     this.getSearches = () =>
       Object.keys(peerSearches).map(k => searchDetails(k))
 
-    this.resolvePeerId = async (peerID) => {
+    const resolvePeerId = async (peerID) => {
       if (peersList.has(peerID)) return peersList.get(peerID)   //Short circuit
       if (peerID.toB58String) peerID = peerID.toB58String()
 
@@ -111,6 +111,8 @@ class PeerManager {
       }
       throw new Error(`Unable to resolve peer ${peerID}`)
     }
+
+    this.resolvePeerId = resolvePeerId.bind(this)
 
     const createPeerInfo = details => {
       if(PeerInfo.isPeerInfo(details)) return details  //Short circuit
@@ -248,10 +250,9 @@ class PeerManager {
 
 
     this.attachDB = (db => {
-      logger.debug(`Attaching db ${db.id}`)
-      db.events.on("peer", async function (peerId) {
-        logger.debug(`peer event: ${peerId}`)
-        const peer = await this.resolvePeerId(peerId)
+      db.events.on("peer", function (peer) {
+        const peer = await resolvePeerId(peerIDStr)
+        logger.debug(`resolved peer from event ${peer.id.toB58String()}`)
         addPeer(db, peer)
       })
     }).bind(this)
