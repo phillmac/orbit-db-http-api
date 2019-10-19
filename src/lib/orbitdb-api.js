@@ -127,7 +127,10 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/dbs/announce',
-        handler: (_request, _h) => peerMan.announceDBs()
+        handler: (_request, _h) => {
+          peerMan.announceDBs()
+          return {}
+        }
       },
 
       {
@@ -155,7 +158,10 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/announce',
-        handler: dbMiddleware(async (db, _request, _h) => peerMan.announceDB(db))
+        handler: dbMiddleware(async (db, _request, _h) => {
+          peerMan.announceDB(db)
+          return {}
+        })
       },
       {
         method: 'DELETE',
