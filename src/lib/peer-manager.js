@@ -245,12 +245,12 @@ class PeerManager {
       dbPeers[db.id][peer.id.toB58String()] = peer
     })
 
- 
+
 
     this.attachDB = (db => {
-      db.events.on("peer", function (peer) {
-        logger.debug(`peer event: ${peer}`)
-        const peer = await this.resolvePeerId(peerIDStr)
+      db.events.on("peer", function (peerId) {
+        logger.debug(`peer event: ${peerId}`)
+        const peer = await this.resolvePeerId(peerId)
         addPeer(db, peer)
       })
     }).bind(this)
