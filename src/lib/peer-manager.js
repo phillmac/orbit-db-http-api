@@ -228,7 +228,7 @@ class PeerManager {
             result.on('data', chunk => {
               if (chunk.Type === 4) {
                 logger.debug(`Found peers from DHT: ${JSON.stringify(chunk)}`)
-                newPeers = chunk.Responses.map(r => createPeerInfo(r))
+                const newPeers = chunk.Responses.map(r => createPeerInfo(r))
                 for (const peer of newPeers) {
                   addPeer(db, peer)
                 }
