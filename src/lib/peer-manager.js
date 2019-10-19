@@ -1,5 +1,34 @@
 const isDefined = (arg) => arg !== undefined && arg !== null
 
+function MakeQuerablePromise (promise) {
+  // Don't modify any promise that has been already modified.
+  if (promise.isResolved) return promise
+
+  // Set initial state
+  var isPending = true
+  var isRejected = false
+  var isFulfilled = false
+
+  // Observe the promise, saving the fulfillment in a closure scope.
+  var result = promise.then(
+    function (v) {
+      isFulfilled = true
+      isPending = false
+      return v
+    },
+    function (e) {
+      isRejected = true
+      isPending = false
+      throw e
+    }
+  )
+
+  result.isFulfilled = function () { return isFulfilled }
+  result.isPending = function () { return isPending }
+  result.isRejected = function () { return isRejected }
+  return result
+}
+
 class PeerManager {
   constructor (ipfs, orbitDB, options = {}) {
     if (!isDefined(options.PeerInfo)) { throw new Error('options.PeerInfo is a required argument.') }
@@ -74,33 +103,26 @@ class PeerManager {
       if (peersList.has(peerID)) return peersList.get(peerID) // Short circuit
       if (peerID.toB58String) peerID = peerID.toB58String()
 
-      const p1 = (async () => {
-        try {
-          const swarmPeers = await ipfs.swarm.addrs()
-          for (const PeerInfo of swarmPeers) {
-            if (peerID.includes(PeerInfo.id.toB58String())) {
-              resolved[p1] = true
-              return PeerInfo
+      const resolved = [
+        MakeQuerablePromise((async () => {
+          try {
+            const swarmPeers = await ipfs.swarm.addrs()
+            for (const PeerInfo of swarmPeers) {
+              if (peerID.includes(PeerInfo.id.toB58String())) {
+                return PeerInfo
+              }
             }
+          } catch (err) {
+            logger.debug(err)
           }
-        } catch (err) {
-          logger.debug(err)
-        }
-      })()
-      const p2 = resolvePeerAddrs(peerID).search.then(details => {
-        resolved[p2] = true
-        return details
-      })
-
-      const resolved = {
-        [p1]: false,
-        [p2]: false
-      }
+        })()),
+        MakeQuerablePromise(resolvePeerAddrs(peerID).search)
+      ]
 
       let result
 
-      while (Object.keys(resolved).some(p => !resolved[p]) && !result) {
-        result = await Promise.race(Object.keys(resolved).filter(p => !resolved[p]))
+      while (Object.keys(resolved).some(p => p.isPending()) && !result) {
+        result = await Promise.race(resolved.filter(p => p.isPending()))
       }
 
       if (result) {
