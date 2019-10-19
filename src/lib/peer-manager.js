@@ -120,8 +120,8 @@ class PeerManager {
       Object.keys(peerSearches).map(k => searchDetails(k))
 
     const resolvePeerId = async (peerID) => {
+      if (PeerId.isPeerId(peerID)) peerID = peerID.toB58String()
       if (peersList.has(peerID)) return peersList.get(peerID) // Short circuit
-      if (peerID.toB58String) peerID = peerID.toB58String()
 
       const resolved = [
         MakeQuerablePromise(new Promise((resolve, reject) => {
@@ -227,7 +227,7 @@ class PeerManager {
             result.on('end', () => resolve(peers))
             result.on('data', chunk => {
               if (chunk.Type === 4) {
-                logger.debug(`Found peers from DHT: ${chunk}`)
+                logger.debug(`Found peers from DHT: ${JSON.stringify(chunk)}`)
                 peers = peers.concat(chunk.Responses.map(r => createPeerInfo(r)))
               }
             })
