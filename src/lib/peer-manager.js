@@ -133,7 +133,7 @@ class PeerManager {
     const resolvePeerId = async (peerID) => {
       let result
       if (PeerId.isPeerId(peerID)) peerID = peerID.toB58String()
-      if (peersList.has(peerID)) result = peersList.get(peerID) // Short circuit
+      if (peersList.has(peerID)) return result // Short circuit
 
       const resolved = [
         MakeQuerablePromise(swarmFindPeer(peerID).then(function(peer){
@@ -236,7 +236,7 @@ class PeerManager {
             result.on('data', chunk => {
               if (chunk.Type === 4) {
                 const newPeers = chunk.Responses.map(r => createPeerInfo(r))
-                logger.debug(`Found peers from DHT: ${newPeers}`)
+                logger.debug(`Found peers from DHT: ${JSON.stringify(chunk.Responses)}`)
                 for (const peer of newPeers) {
                   addPeer(db, peer)
                 }
