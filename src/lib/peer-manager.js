@@ -152,7 +152,7 @@ class PeerManager {
 
     this.resolvePeerId = resolvePeerId.bind(this)
 
-    const createPeerInfo = async (details) => {
+    const createPeerInfo = (details) => {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
       let peerInfo
       if (PeerId.isPeerId(details)) return new PeerInfo(details)
@@ -240,7 +240,6 @@ class PeerManager {
       search.then(peers => {
         logger.info(`Finished finding peers for ${db.id}`)
         for (const peer of peers) {
-          logger.debug(peer, peer.id)
           peersList.put(peer, false)
         }
       }).catch(err => {
