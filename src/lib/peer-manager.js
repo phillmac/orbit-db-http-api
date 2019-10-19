@@ -149,6 +149,7 @@ class PeerManager {
       if (PeerInfo.isPeerInfo(details)) return details // Short circuit
       let result
       if (isDefined(details.ID)) {
+        logger.debug(details.ID)
         result = PeerInfo.create(details.ID)
       } else {
         throw new Error('Unhandled createPeerInfo', details) // Peer id property is something other then 'ID'
