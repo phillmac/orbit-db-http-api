@@ -248,7 +248,7 @@ class PeerManager {
 
 
     this.attachDB = (db => {
-      db.events.on("peer", function (peerId) {
+      db.events.on("peer", async function (peerId) {
         logger.debug(`peer event: ${peerId}`)
         const peer = await this.resolvePeerId(peerId)
         addPeer(db, peer)
