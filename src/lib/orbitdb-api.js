@@ -54,7 +54,7 @@ class OrbitdbAPI {
       all: () => true
     }
 
-    const dbManiddleware = fn =>
+    const dbMiddleware = fn =>
       async (request, h) => {
         const db = await dbMan.get(request.params.dbname)
         return Promise.resolve((fn(db, request, h)))
@@ -144,12 +144,12 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}',
-        handler: dbManiddleware(async (db, _request, _h) => dbMan.dbInfo(db))
+        handler: dbMiddleware(async (db, _request, _h) => dbMan.dbInfo(db))
       },
       {
         method: 'DELETE',
         path: '/db/{dbname}',
-        handler: dbManiddleware(async (db, _request, _h) => {
+        handler: dbMiddleware(async (db, _request, _h) => {
           await peerMan.detachDB(db)
           await db.close()
           return {}
@@ -158,7 +158,7 @@ class OrbitdbAPI {
       {
         method: 'DELETE',
         path: '/db/{dbname}/{item}',
-        handler: dbManiddleware(async (db, request, _h) => {
+        handler: dbMiddleware(async (db, request, _h) => {
           if (db.del) {
             return { hash: await db.del(request.params.item) }
           } else if (db.remove) {
@@ -175,7 +175,7 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/put',
-        handler: dbManiddleware(async (db, request, _h) => {
+        handler: dbMiddleware(async (db, request, _h) => {
           const params = request.payload
 
           if (db.type === 'keyvalue') {
@@ -194,14 +194,14 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/add',
-        handler: dbManiddleware(async (db, request, _h) => {
+        handler: dbMiddleware(async (db, request, _h) => {
           return { hash: await db.add(request.payload) }
         })
       },
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc',
-        handler: dbManiddleware(async (db, request, _h) => {
+        handler: dbMiddleware(async (db, request, _h) => {
           const incval = parseInt(request.payload ? request.payload.val || 1 : 1)
           return { hash: await db.inc(incval) }
         })
@@ -209,14 +209,14 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc/{val}',
-        handler: dbManiddleware(async (db, request, _h) => {
+        handler: dbMiddleware(async (db, request, _h) => {
           return { hash: await db.inc(parseInt(request.params.val || 1)) }
         })
       },
       {
         method: 'POST',
         path: '/db/{dbname}/query',
-        handler: dbManiddleware(async (db, request, _h) => {
+        handler: dbMiddleware(async (db, request, _h) => {
           logger.debug('Query reqest payload', request.payload)
           const qparams = request.payload
           const comparison = comparisons[qparams.comp || 'all']
@@ -227,7 +227,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/iterator',
-        handler: dbManiddleware(async (db, request, h) => {
+        handler: dbMiddleware(async (db, request, h) => {
           const raw = rawIterator(db, request, h)
           return raw.map((e) => Object.keys(e.payload.value)[0])
         })
@@ -235,21 +235,21 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/rawiterator',
-        handler: dbManiddleware(async (db, request, h) => {
+        handler: dbMiddleware(async (db, request, h) => {
           return rawIterator(db, request, h)
         })
       },
       {
         method: 'GET',
         path: '/db/{dbname}/raw/{item}',
-        handler: dbManiddleware(async (db, request, h) => {
+        handler: dbMiddleware(async (db, request, h) => {
           return getRaw(db, request, h)
         })
       },
       {
         method: 'GET',
         path: '/db/{dbname}/{item}',
-        handler: dbManiddleware(async (db, request, h) => {
+        handler: dbMiddleware(async (db, request, h) => {
           const raw = getRaw(db, request, h)
           return unpackContents(raw)
         })
@@ -257,7 +257,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/all',
-        handler: dbManiddleware(async (db, _request, _h) => {
+        handler: dbMiddleware(async (db, _request, _h) => {
           if (typeof db._query === 'function') {
             const contents = db._query({ limit: -1 })
             return contents.map((e) => Object.keys(e.payload.value)[0])
@@ -269,12 +269,12 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/index',
-        handler: dbManiddleware(async (db, _request, _h) => db.index)
+        handler: dbMiddleware(async (db, _request, _h) => db.index)
       },
       {
         method: 'GET',
         path: '/db/{dbname}/value',
-        handler: dbManiddleware(async (db, _request, _h) => db.value)
+        handler: dbMiddleware(async (db, _request, _h) => db.value)
       },
       {
         method: 'GET',
@@ -284,7 +284,7 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/access/write',
-        handler: dbManiddleware(async (db, request, _h) =>
+        handler: dbMiddleware(async (db, request, _h) =>
           {
             const result = await db.access.grant('write', request.payload.id)
             if (result === false) {
@@ -297,12 +297,12 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/access/write/list',
-        handler: dbManiddleware(async (db, _request, _h) => dbMan.dbWrite(db))
+        handler: dbMiddleware(async (db, _request, _h) => dbMan.dbWrite(db))
       },
       {
         method: 'GET',
         path: '/db/{dbname}/events/{eventname}',
-        handler: dbManiddleware(async (db, request, h) => {
+        handler: dbMiddleware(async (db, request, h) => {
           const events = request.params.eventname.split(',')
           events.forEach((eventName) => addEventListener(db, eventName, request, h))
           return h.event({ event: 'registered', data: { eventnames: events } })
@@ -312,7 +312,7 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/db/{dbname}/peers',
-        handler: dbManiddleware((db, _request, _h) => peerMan.getPeers(db))
+        handler: dbMiddleware((db, _request, _h) => peerMan.getPeers(db))
       },
 
       {
@@ -330,9 +330,14 @@ class OrbitdbAPI {
       {
         method: 'POST',
         path: '/peers/searches/db/{dbname}',
-        handler: dbManiddleware((db, request, _h) => peerMan.findPeers(db, request.payload))
-      }
+        handler: dbMiddleware((db, request, _h) => peerMan.findPeers(db, request.payload))
+      },
 
+      {
+        method: 'POST',
+        path: '/peers/searches/peer/{peerID}',
+        handler: peerMan.dhtFindPeer(request.params.peerID)
+      }
     ])
   }
 }
