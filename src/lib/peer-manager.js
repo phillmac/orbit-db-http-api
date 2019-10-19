@@ -121,13 +121,11 @@ class PeerManager {
       Object.keys(peerSearches).map(k => searchDetails(k))
 
     const swarmFindPeer = async (peerIDStr) => {
-      ipfs.swarm.addrs().then(swarmPeers => {
-        for (const peer of swarmPeers) {
-          if (peerIDStr.includes(peer.id.toB58String())) {
-            return peer
-          }
+      for (const peer of await ipfs.swarm.addrs()) {
+        if (peerIDStr.includes(peer.id.toB58String())) {
+          return peer
         }
-      })
+      }
     }
 
     const resolvePeerId = async (peerID) => {
