@@ -230,8 +230,9 @@ class PeerManager {
       return { isNew: true, details: searchDetails(db.id), search }
     }
 
-    this.getPeers = db => {
-      return (dbPeers[db.id] || []).map(p => {
+    this.getPeers = (db) => {
+      if(!(db.id in dbPeers)) return []
+      return Object.values(dbPeers[db.id]).map(p => {
         return {
           id: p.id.toB58String(),
           multiaddrs: p.multiaddrs.toArray().map(m => m.toString())
@@ -261,14 +262,14 @@ class PeerManager {
     const addPeer = (db, peer) => {
       if (!PeerInfo.isPeerInfo(peer)) peer = createPeerInfo(peer)
       peersList.put(peer, false)
-      if(!isDefined(dbPeers[db.id])) dbPeers[db.id] = {}
+      if(!(db.id in dbPeers)) dbPeers[db.id] = {}
       dbPeers[db.id][peer.id.toB58String()] = peer
     }
 
     this.attachDB = db => {
       db.events.on('peer', async function (peerID) {
         const peer = await resolvePeerId(peerID)
-        logger.debug(`resolved peer from event ${peer.id.toB58String()}`)
+        logger.debug(`Resolved peer from event ${peer.id.toB58String()}`)
         addPeer(db, peer)
       })
     }
