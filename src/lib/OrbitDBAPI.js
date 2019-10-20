@@ -100,7 +100,10 @@ class OrbitdbAPI {
         closed: (dbname) =>
           h.event({event: 'closed', data: {dbname}}),
         peer: (peer) =>
-          h.event({event: 'peer', data: {peer}})
+          h.event({event: 'peer', data: {peer}}),
+        'search.complete': (dbname, peers) => {
+          h.event({event: 'search.complete', data: {dbname, peers}})
+        }
       }))
 
       const eventCallback = eventMap.get(eventName)
