@@ -33,6 +33,7 @@
     "ipfs-http-client": ">32.0.0",
     "lodash": "^4.17.12",
     "orbit-db": "^0.22.0",
+    "orbit-db-managers": "^0.0.7",
     "susie": "^3.0.0"
   }
 }

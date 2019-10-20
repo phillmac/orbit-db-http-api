@@ -1,8 +1,7 @@
 const Ipfs = require('ipfs')
 const OrbitDB = require('orbit-db')
-const DBManager = require('../lib/db-manager.js')
-const PeerManager = require('../lib/peer-manager.js')
-const OrbitDBApi = require('../lib/orbitdb-api.js')
+const {DBManager, PeerManager} = require('orbit-db-managers')
+const OrbitDBApi = require('../lib/OrbitDBAPI.js')
 
 
 const merge = require('lodash/merge')

@@ -1,8 +1,7 @@
 const IpfsApi = require('ipfs-http-client')
 const OrbitDB = require('orbit-db')
-const DBManager = require('../lib/db-manager.js')
-const PeerManager = require('../lib/peer-manager.js')
-const OrbitDBApi = require('../lib/orbitdb-api.js')
+const {DBManager, PeerManager} = require('orbit-db-managers')
+const OrbitDBApi = require('../lib/OrbitDBAPI.js')
 
 async function apiFactory (options) {
 
