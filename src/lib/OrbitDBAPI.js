@@ -222,7 +222,7 @@ class OrbitdbAPI {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc',
         handler: dbMiddleware(async (db, request, _h) => {
-          const incval = parseInt(request.payload ? request.payload.val || 1 : 1)
+          const incval = parseInt(request.payload && request.payload.val)
           return { hash: await db.inc(incval) }
         })
       },
@@ -230,7 +230,7 @@ class OrbitdbAPI {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc/{val}',
         handler: dbMiddleware(async (db, request, _h) => {
-          return { hash: await db.inc(parseInt(request.params.val || 1)) }
+          return { hash: await db.inc(parseInt(request.params.val))}
         })
       },
       {
