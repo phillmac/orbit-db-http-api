@@ -263,7 +263,7 @@ class OrbitdbAPI {
         method: 'GET',
         path: '/db/{dbname}/raw/{item}',
         handler: dbMiddleware(async (db, request, h) => {
-          return getRaw(db, request, h)
+          return JSON.stringify(getRaw(db, request, h))
         })
       },
       {
@@ -271,7 +271,7 @@ class OrbitdbAPI {
         path: '/db/{dbname}/{item}',
         handler: dbMiddleware(async (db, request, h) => {
           const raw = getRaw(db, request, h)
-          return unpackContents(raw)
+          return JSON.stringify(unpackContents(raw))
         })
       },
       {
