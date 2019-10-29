@@ -73,7 +73,7 @@ async function init () {
     const ipfsPort = args['--ipfs-port'] || process.env.IPFS_PORT
     const ipfsDHT = args['--ipfs-dht'] || process.env.IPFS_DHT
     const apiDebug = args['--debug'] || process.env.API_DEBUG
-    const dbAnnounce = args['--announce-dbs'] || process.env.ANNOUNCE_DBS
+    const announceDBs = args['--announce-dbs'] || process.env.ANNOUNCE_DBS
 
     const cliOptions = {
       ipfs: {
@@ -97,7 +97,7 @@ async function init () {
       peerMan: {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
-        dbAnnounce: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(dbAnnounce),
+        announceDBs: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(announceDBs),
         logger
       },
       server: {
@@ -126,7 +126,7 @@ async function init () {
     if (!options.server.http2.certFile) throw new Error('--https-cert is required')
     if (!options.server.http2.certKeyFile) throw new Error('--https-key is required')
     if (!options.server.hapi.port) options.server.hapi.port = 3000
-    if (dbAnnounce && ipfsMode === 'local' && (!ipfsDHT)) {
+    if (announceDBs && ipfsMode === 'local' && (!ipfsDHT)) {
       logger.warn('DB announcing disabled due to IPFS DHT not enabled')
     }
 
