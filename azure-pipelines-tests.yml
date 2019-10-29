@@ -1,0 +1,15 @@
+
+trigger:
+- debug
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+
+- script: 'docker run -d node:12 bash -c "mkdir orbit-db-htt-api-dev && cd orbit-db-htt-api-dev && curl -L https://github.com/orbitdb/py-orbit-db-http-client/tarball/develop | tar -xz --strip-components 1 && npm install && node src/cli.sj" '
+  displayName: 'Run docker container'
