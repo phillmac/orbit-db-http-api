@@ -128,7 +128,10 @@ async function init () {
     if (!options.server.hapi.port) options.server.hapi.port = 3000
     if (announceDBs && ipfsMode === 'local' && (!ipfsDHT)) {
       logger.warn('DB announcing disabled due to IPFS DHT not enabled')
+    } else if (announceDBs) {
+      logger.info('Automatic Announce DBs to DHT enabled')
     }
+
 
     logger.debug(`Options: ${JSON.stringify(options, null, 4)}`)
 
