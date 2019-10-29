@@ -20,9 +20,9 @@ steps:
 
 - script: |
     docker run \
-    --net host
-    --name orbit-db-http-api
-    -e IPFS_HOST='localhost'
-    -e LOG='DEBUG'
-    phillmac/orbit-db-http-api-dev:debug
+    --net host \
+    --name orbit-db-http-api \
+    -e IPFS_HOST='localhost' \
+    -e LOG='DEBUG' \
+    phillmac/orbit-db-http-api-dev:debug src/cli.js api
   displayName: 'Run orbit-db-http-api-container'
