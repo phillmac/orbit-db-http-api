@@ -138,6 +138,10 @@ async function init () {
 
     logger.debug(`Options: ${JSON.stringify(options, null, 4)}`)
 
+    if (
+      options.server.http2.certKeyFile &&
+      options.server.http2.certFile
+    )
     options = merge(options, {
       server: {
         http2: {
