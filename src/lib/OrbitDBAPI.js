@@ -1,5 +1,6 @@
 const Hapi = require('hapi')
 const Boom = require('@hapi/boom')
+const Http = require('http')
 const Http2 = require('http2')
 const Susie = require('susie')
 
@@ -24,7 +25,11 @@ class OrbitdbAPI {
       logger.info('Debug enabled')
     }
 
-    const listener = Http2.createSecureServer(options.server.http2)
+
+    const listener = options.forceHTTP1 ?
+    Http.createServer(options.server.http) :
+    Http2.createSecureServer(options.server.http2)
+
     this.server = new Hapi.Server(Object.assign(
         options.server.hapi,
         {listener}

@@ -66,9 +66,11 @@ async function init () {
     const ipfsMode = (args.api && 'api') || (args.local && 'local')
     const orbitDBDir = args['--orbitdb-dir'] || process.env.ORBITDB_DIR
     const apiPort = args['--api-port'] || process.env.API_PORT
+    const enableTLS = args['--enable-tls'] || process.env.ENABLE_TLS
     const certFile = args['--https-cert'] || process.env.HTTPS_CERT
     const certKeyFile = args['--https-key'] || process.env.HTTPS_KEY
-    const allowHTTP1 = args['--http1-enable'] || process.env.ALLOW_HTTP1
+    const forceHTTP1 = args['--force-http1'] || process.env.FORCE_HTTP1
+    const allowHTTP1 = args['--allow-http1'] || process.env.ALLOW_HTTP1
     const ipfsHost = args['--ipfs-host'] || process.env.IPFS_HOST
     const ipfsPort = args['--ipfs-port'] || process.env.IPFS_PORT
     const ipfsDHT = args['--ipfs-dht'] || process.env.IPFS_DHT
@@ -103,8 +105,9 @@ async function init () {
       server: {
         hapi: {
           port: apiPort,
-          tls: true,
+          tls: Boolean(enableTLS) || (certKeyFile && certFile),
         },
+        forceHTTP1: Boolean(forceHTTP1),
         http2: {
           allowHTTP1: Boolean(allowHTTP1),
           certKeyFile: certKeyFile,
@@ -123,8 +126,8 @@ async function init () {
        cliOptions
     )
 
-    if (!options.server.http2.certFile) throw new Error('--https-cert is required')
-    if (!options.server.http2.certKeyFile) throw new Error('--https-key is required')
+    if ((enableTLS) && (!options.server.http2.certFile)) throw new Error('--https-cert is required')
+    if ((enableTLS) && (!options.server.http2.certKeyFile)) throw new Error('--https-key is required')
     if (!options.server.hapi.port) options.server.hapi.port = 3000
     if (announceDBs && ipfsMode === 'local' && (!ipfsDHT)) {
       logger.warn('DB announcing disabled due to IPFS DHT not enabled')
