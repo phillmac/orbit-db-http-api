@@ -26,7 +26,7 @@ class OrbitdbAPI {
     }
 
 
-    const listener = orbitdbAPIOptions.forceHTTP1 ?
+    const listener = options.server.forceHTTP1 ?
     Http.createServer(options.server.http) :
     Http2.createSecureServer(options.server.http2)
 
