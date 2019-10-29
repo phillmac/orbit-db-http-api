@@ -11,5 +11,18 @@ steps:
   inputs:
     dockerVersion: '17.09.0-ce'
 
-- script: 'docker run node:12 bash -c "mkdir orbit-db-htt-api-dev && cd orbit-db-htt-api-dev && curl -L https://github.com/phillmac/orbit-db-http-api-dev/tarball/debug | tar -xz --strip-components 1 && npm install && node src/cli.sj" '
-  displayName: 'Run docker container'
+- script: |
+    docker run -d \
+    --net host \
+    --name ipfs \
+    ipfs/go-ipfs:latest daemon --enable-pubsub-experiment
+  displayName: 'Run ipfs daemon'
+
+- script: |
+    docker run \
+    --net host
+    --name orbit-db-http-api
+    -e IPFS_HOST='localhost'
+    -e LOG='DEBUG'
+    phillmac/orbit-db-http-api-dev:debug
+  displayName: 'Run orbit-db-http-api-container'
