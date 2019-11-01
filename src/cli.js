@@ -31,9 +31,11 @@ Options:
     --api-port=API_PORT             Listen for api calls on API_PORT
     --orbitdb-dir=ORBITDB_DIR       Store orbit-db files in ORBITDB_DIR
     --config=CONFIG                 Load orbit-db conf options from ORBITDB_CONF
+    --enable-tls                    Require https for connections. Enabled by default if https cert & key present
     --https-cert=HTTPS_CERT         Path to https cert
     --https-key=HTTPS_KEY           Path to https cert key
-    --http1-enable                  Enable HTTP1.X connections to api
+    --force-http1                   Disable HTTP2
+    --allow-http1                   Enable HTTP1.X connections to api
     --announce-dbs=ANNOUNCE_DBS     Announce dbs to dht (requires --ipfs-dht in local mode)
 `
     this._args = docopt(doc, {
