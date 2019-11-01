@@ -105,7 +105,7 @@ async function init () {
       server: {
         hapi: {
           port: apiPort,
-          tls: Boolean(enableTLS) || (certKeyFile && certFile),
+          tls: Boolean(enableTLS) || Boolean(certKeyFile && certFile),
         },
         forceHTTP1: Boolean(forceHTTP1),
         http2: {
