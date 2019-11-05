@@ -154,7 +154,11 @@ class OrbitdbAPI {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}',
         handler: async (request, _h) => {
-          const db = await dbMan.get(request.params.dbname, request.payload)
+          const payload = request.payload
+          const db = await dbMan.get(request.params.dbname, payload)
+          if(!db) {
+            return {}
+          }
           return dbMan.dbInfo(db)
         }
       },
