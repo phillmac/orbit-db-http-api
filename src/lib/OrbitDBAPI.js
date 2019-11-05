@@ -156,7 +156,7 @@ class OrbitdbAPI {
         handler: async (request, _h) => {
           const payload = request.payload
           const db = await dbMan.get(request.params.dbname, payload)
-          if(!db) { //TODO: add docs
+          if (!db) { //TODO: add docs
             return {}
           }
           return dbMan.dbInfo(db)
