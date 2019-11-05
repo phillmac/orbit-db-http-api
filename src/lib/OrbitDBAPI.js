@@ -12,10 +12,10 @@ class OrbitdbAPI {
 
     const logger = Object.assign(
       {
-        debug: function() {},
-        info: function() {},
-        warn: function() {},
-        error: function() {}
+        debug: function () {},
+        info: function () {},
+        warn: function () {},
+        error: function () {}
       },
       options.logger,
       orbitdbAPIOptions.logger
@@ -25,13 +25,13 @@ class OrbitdbAPI {
       logger.info('Debug enabled')
     }
 
-    const listener = options.server.forceHTTP1 ?
-    Http.createServer(options.server.http) :
-    Http2.createSecureServer(options.server.http2)
+    const listener = options.server.forceHTTP1
+      ? Http.createServer(options.server.http)
+      : Http2.createSecureServer(options.server.http2)
 
     this.server = new Hapi.Server(Object.assign(
-        options.server.hapi,
-        {listener}
+      options.server.hapi,
+      { listener }
     ))
 
     this.server.ext('onPreResponse', (request, h) => {
@@ -88,25 +88,25 @@ class OrbitdbAPI {
     const addDBEventListener = (db, eventName, request, h) => {
       const eventMap = new Map(Object.entries({
         replicated: (address) =>
-          h.event({event: 'replicated', data: {address}}),
+          h.event({ event: 'replicated', data: { address } }),
         replicate: (address) =>
-          h.event({event: 'replicate', data: {address}}),
+          h.event({ event: 'replicate', data: { address } }),
         'replicate.progress': (address, hash, entry, progress, have) =>
-          h.event({event: 'replicate.progress', data:{address,hash,entry,progress,have}}),
+          h.event({ event: 'replicate.progress', data: { address, hash, entry, progress, have } }),
         load: (dbname) =>
-          h.event({ event: 'load', data: {dbname}}),
+          h.event({ event: 'load', data: { dbname } }),
         'load.progress': (address, hash, entry, progress, total) =>
-          h.event({event: 'load.progress', data: {address, hash, entry, progress, total}}),
+          h.event({ event: 'load.progress', data: { address, hash, entry, progress, total } }),
         ready: (dbname, heads) =>
-          h.event({event: 'ready', data: {dbname, heads}}),
+          h.event({ event: 'ready', data: { dbname, heads } }),
         write: (dbname, hash, entry) =>
-          h.event({event: 'write', data: {dbname, hash, entry}}),
+          h.event({ event: 'write', data: { dbname, hash, entry } }),
         closed: (dbname) =>
-          h.event({event: 'closed', data: {dbname}}),
+          h.event({ event: 'closed', data: { dbname } }),
         peer: (peer) =>
-          h.event({event: 'peer', data: {peer}}),
+          h.event({ event: 'peer', data: { peer } }),
         'search.complete': (dbname, peers) => {
-          h.event({event: 'search.complete', data: {dbname, peers}})
+          h.event({ event: 'search.complete', data: { dbname, peers } })
         }
       }))
 
@@ -127,7 +127,7 @@ class OrbitdbAPI {
     const addDBManEventListener = (eventName, request, h) => {
       const eventMap = new Map(Object.entries({
         open: (address) =>
-          h.event({event: 'open', data: {address}})
+          h.event({ event: 'open', data: { address } })
       }))
 
       const eventCallback = eventMap.get(eventName)
@@ -143,7 +143,6 @@ class OrbitdbAPI {
         throw Boom.badRequest('Unrecognized event name')
       }
     }
-
 
     Promise.resolve(this.server.register(Susie)).catch((err) => { throw err })
     this.server.route([
@@ -176,7 +175,7 @@ class OrbitdbAPI {
         handler: async (request, _h) => {
           const payload = request.payload
           const db = await dbMan.get(request.params.dbname, payload)
-          if (!db) { //TODO: add docs
+          if (!db) { // TODO: add docs
             return {}
           }
           return dbMan.dbInfo(db)
@@ -259,7 +258,7 @@ class OrbitdbAPI {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/inc/{val}',
         handler: dbMiddleware(async (db, request, _h) => {
-          return { hash: await db.inc(parseInt(request.params.val))}
+          return { hash: await db.inc(parseInt(request.params.val)) }
         })
       },
       {
@@ -333,14 +332,13 @@ class OrbitdbAPI {
       {
         method: ['POST', 'PUT'],
         path: '/db/{dbname}/access/write',
-        handler: dbMiddleware(async (db, request, _h) =>
-          {
-            const result = await db.access.grant('write', request.payload.id)
-            if (result === false) {
-              return Boom.notImplemented('Access controller does not support setting write access')
-            }
-            return result
+        handler: dbMiddleware(async (db, request, _h) => {
+          const result = await db.access.grant('write', request.payload.id)
+          if (result === false) {
+            return Boom.notImplemented('Access controller does not support setting write access')
           }
+          return result
+        }
         )
       },
       {
@@ -352,8 +350,8 @@ class OrbitdbAPI {
         method: 'GET',
         path: '/db/{dbname}/events/{eventnames}',
         handler: dbMiddleware(async (db, request, h) => {
-          eventnames = request.params.eventnames
-          const events = typeof eventnames ==='string' ? eventnames.split(',') : eventnames
+          const eventnames = request.params.eventnames
+          const events = typeof eventnames === 'string' ? eventnames.split(',') : eventnames
           events.forEach((eventName) => addDBEventListener(db, eventName, request, h))
           return h.event({ event: 'registered', data: { events } })
         })
@@ -366,9 +364,9 @@ class OrbitdbAPI {
       {
         method: 'GET',
         path: '/events/{eventnames}',
-        handler: () => {
-          eventnames = request.params.eventnames
-          const events = typeof eventnames ==='string' ? eventnames.split(',') : eventnames
+        handler: (request, h) => {
+          const eventnames = request.params.eventnames
+          const events = typeof eventnames === 'string' ? eventnames.split(',') : eventnames
           events.forEach((eventName) => addDBManEventListener(eventName, request, h))
           return h.event({ event: 'registered', data: { events } })
         }

@@ -1,13 +1,11 @@
 const Ipfs = require('ipfs')
 const OrbitDB = require('orbit-db')
-const {DBManager, PeerManager} = require('orbit-db-managers')
+const { DBManager, PeerManager } = require('orbit-db-managers')
 const OrbitDBApi = require('../lib/OrbitDBAPI.js')
-
 
 const merge = require('lodash/merge')
 
 async function apiFactory (options) {
-
   options = merge({
     ipfs: {
       EXPERIMENTAL: {

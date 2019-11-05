@@ -13,8 +13,6 @@ const PeerInfo = require('peer-info')
 const multiaddr = require('multiaddr')
 const PeerBook = require('peer-book')
 
-
-
 class Cli {
   constructor () {
     const doc =
@@ -107,14 +105,14 @@ async function init () {
       server: {
         hapi: {
           port: apiPort,
-          tls: Boolean(enableTLS) || Boolean(certKeyFile && certFile),
+          tls: Boolean(enableTLS) || Boolean(certKeyFile && certFile)
         },
         forceHTTP1: Boolean(forceHTTP1),
         http2: {
           allowHTTP1: Boolean(allowHTTP1),
           certKeyFile: certKeyFile,
           certFile: certFile
-        },
+        }
       }
     }
 
@@ -125,7 +123,7 @@ async function init () {
         PeerId,
         PeerInfo
       },
-       cliOptions
+      cliOptions
     )
 
     if ((enableTLS) && (!options.server.http2.certFile)) throw new Error('--https-cert is required')
@@ -137,21 +135,21 @@ async function init () {
       logger.info('Automatic Announce DBs to DHT enabled')
     }
 
-
     logger.debug(`Options: ${JSON.stringify(options, null, 4)}`)
 
     if (
       options.server.http2.certKeyFile &&
       options.server.http2.certFile
-    )
-    options = merge(options, {
-      server: {
-        http2: {
-          key: fs.readFileSync(options.server.http2.certKeyFile),
-          cert: fs.readFileSync(options.server.http2.certFile)
+    ) {
+      options = merge(options, {
+        server: {
+          http2: {
+            key: fs.readFileSync(options.server.http2.certKeyFile),
+            cert: fs.readFileSync(options.server.http2.certFile)
+          }
         }
-      }
-    })
+      })
+    }
 
     switch (ipfsMode) {
       case 'local':
