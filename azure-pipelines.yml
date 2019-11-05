@@ -55,6 +55,7 @@ stages:
         treatPartiallySucceededBuildAsSuccessful: false
         downloadBuildArtifacts: false
         storeInEnvironmentVariable: false
+        buildParameters: 'API_Image_Branch:develop'
         authenticationMethod: 'Personal Access Token'
         password: '$(PiplinesPAT)'
         enableBuildInQueueCondition: false
