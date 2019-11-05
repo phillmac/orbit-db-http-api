@@ -25,7 +25,6 @@ class OrbitdbAPI {
       logger.info('Debug enabled')
     }
 
-
     const listener = options.server.forceHTTP1 ?
     Http.createServer(options.server.http) :
     Http2.createSecureServer(options.server.http2)
@@ -86,7 +85,7 @@ class OrbitdbAPI {
       return contents
     }
 
-    const addEventListener = (db, eventName, request, h) => {
+    const addDBEventListener = (db, eventName, request, h) => {
       const eventMap = new Map(Object.entries({
         replicated: (address) =>
           h.event({event: 'replicated', data: {address}}),
@@ -124,6 +123,27 @@ class OrbitdbAPI {
         throw Boom.badRequest('Unrecognized event name')
       }
     }
+
+    const addDBManEventListener = (eventName, request, h) => {
+      const eventMap = new Map(Object.entries({
+        open: (address) =>
+          h.event({event: 'open', data: {address}})
+      }))
+
+      const eventCallback = eventMap.get(eventName)
+      if (eventCallback) {
+        dbMan.events.on(eventName, eventCallback)
+        const keepAlive = setInterval(() => h.event({ event: 'keep-alive' }), 10000)
+        request.events.on('disconnect', () => {
+          dbMan.events.removeListener(eventName, eventCallback)
+          clearInterval(keepAlive)
+        })
+      } else {
+        if (options.orbitDBAPI.apiDebug) throw Boom.badRequest(`Unrecognized event name: ${eventName}`)
+        throw Boom.badRequest('Unrecognized event name')
+      }
+    }
+
 
     Promise.resolve(this.server.register(Susie)).catch((err) => { throw err })
     this.server.route([
@@ -330,17 +350,28 @@ class OrbitdbAPI {
       },
       {
         method: 'GET',
-        path: '/db/{dbname}/events/{eventname}',
+        path: '/db/{dbname}/events/{eventnames}',
         handler: dbMiddleware(async (db, request, h) => {
-          const events = request.params.eventname.split(',')
-          events.forEach((eventName) => addEventListener(db, eventName, request, h))
-          return h.event({ event: 'registered', data: { eventnames: events } })
+          eventnames = request.params.eventnames
+          const events = typeof eventnames ==='string' ? eventnames.split(',') : eventnames
+          events.forEach((eventName) => addDBEventListener(db, eventName, request, h))
+          return h.event({ event: 'registered', data: { events } })
         })
       },
       {
         method: 'GET',
         path: '/db/{dbname}/peers',
         handler: dbMiddleware((db, _request, _h) => peerMan.getPeers(db))
+      },
+      {
+        method: 'GET',
+        path: '/events/{eventnames}',
+        handler: () => {
+          eventnames = request.params.eventnames
+          const events = typeof eventnames ==='string' ? eventnames.split(',') : eventnames
+          events.forEach((eventName) => addDBManEventListener(eventName, request, h))
+          return h.event({ event: 'registered', data: { events } })
+        }
       },
       {
         method: 'GET',
