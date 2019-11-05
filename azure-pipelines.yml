@@ -37,6 +37,7 @@ stages:
         command: 'push'
         tags: |
           debug
+    - script: node src/cli.js --version
     - task: TriggerBuild@3
       inputs:
         definitionIsInCurrentTeamProject: false
