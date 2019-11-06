@@ -93,20 +93,20 @@ class OrbitdbAPI {
           h.event({ event: 'replicate', data: { address } }),
         'replicate.progress': (address, hash, entry, progress, have) =>
           h.event({ event: 'replicate.progress', data: { address, hash, entry, progress, have } }),
-        load: (dbname) =>
-          h.event({ event: 'load', data: { dbname } }),
+        load: (address, heads) =>
+          h.event({ event: 'load', data: { address, heads } }),
         'load.progress': (address, hash, entry, progress, total) =>
           h.event({ event: 'load.progress', data: { address, hash, entry, progress, total } }),
-        ready: (dbname, heads) =>
-          h.event({ event: 'ready', data: { dbname, heads } }),
-        write: (dbname, hash, entry) =>
-          h.event({ event: 'write', data: { dbname, hash, entry } }),
-        closed: (dbname) =>
-          h.event({ event: 'closed', data: { dbname } }),
+        ready: (address, heads) =>
+          h.event({ event: 'ready', data: { address, heads } }),
+        write: (address, hash, entry) =>
+          h.event({ event: 'write', data: { address, hash, entry } }),
+        closed: (address) =>
+          h.event({ event: 'closed', data: { address } }),
         peer: (peer) =>
           h.event({ event: 'peer', data: { peer } }),
-        'search.complete': (dbname, peers) => {
-          h.event({ event: 'search.complete', data: { dbname, peers } })
+        'search.complete': (address, peers) => {
+          h.event({ event: 'search.complete', data: { address, peers } })
         }
       }))
 
@@ -127,7 +127,11 @@ class OrbitdbAPI {
     const addDBManEventListener = (eventName, request, h) => {
       const eventMap = new Map(Object.entries({
         open: (address) =>
-          h.event({ event: 'open', data: { address } })
+          h.event({ event: 'open', data: { address } }),
+        load: (address) =>
+          h.event({ event: 'load', data: { address } }),
+        ready: (address, heads) =>
+          h.event({ event: 'ready', data: { address, heads } }),
       }))
 
       const eventCallback = eventMap.get(eventName)
