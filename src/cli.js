@@ -115,6 +115,9 @@ async function init () {
         }
       }
     }
+    if (ipfsMode === 'local') {
+      delete cliOptions.ipfs.host, cliOptions.ipfs.port
+    }
 
     options = merge({}, options,
       {
