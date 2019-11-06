@@ -14,7 +14,6 @@ async function apiFactory (options) {
       start: true
     }
   }, options)
-  console.info(options.ipfs)
   const ipfs = await new Promise((resolve, reject) => {
     var node = new Ipfs(options.ipfs)
     node.on('ready', () => {
