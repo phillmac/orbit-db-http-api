@@ -29,7 +29,7 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           debug
-    - script: ls -la node_modules && node src/cli.js --version
+    - script: docker run --rm phillmac/orbit-db-http-api-dev:debug src/cli.js --version
     - task: Docker@2
       displayName: Push image
       inputs:
