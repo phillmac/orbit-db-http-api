@@ -57,10 +57,7 @@ async function init () {
     const config = args['--conf'] || process.env.CONFIG_FILE
 
     if (config) {
-      fs.readFile(config, 'utf8', function (err, data) {
-        if (err) throw err
-        options = JSON.parse(data)
-      })
+      options = JSON.parse(fs.readFileSync(config))
     }
 
     const ipfsMode = (args.api && 'api') || (args.local && 'local')
