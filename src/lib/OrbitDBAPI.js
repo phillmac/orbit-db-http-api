@@ -7,8 +7,10 @@ const Susie = require('susie')
 require('events').EventEmitter.defaultMaxListeners = 50 // Set warning higher then normal to handle many clients
 
 class OrbitdbAPI {
-  constructor (dbMan, peerMan, options) {
+  constructor (managers, options) {
     const orbitdbAPIOptions = Object.assign({}, options.orbitDBAPI)
+
+    const { dbMan, peerMan, sessMan } = managers
 
     const logger = Object.assign(
       {
@@ -131,7 +133,7 @@ class OrbitdbAPI {
         load: (address) =>
           h.event({ event: 'load', data: { address } }),
         ready: (address, heads) =>
-          h.event({ event: 'ready', data: { address, heads } }),
+          h.event({ event: 'ready', data: { address, heads } })
       }))
 
       const eventCallback = eventMap.get(eventName)
