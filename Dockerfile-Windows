@@ -4,9 +4,9 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';$ProgressPrefe
 
 ARG NODE_VERSION="v12.13.1"
 
-RUN Invoke-WebRequest -OutFile nodejs.zip -UseBasicParsing "https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-win-x64.zip"; `
+RUN Invoke-WebRequest -OutFile nodejs.zip -UseBasicParsing "https://nodejs.org/dist/$Env:NODE_VERSION/node-$Env:NODE_VERSION-win-x64.zip"; `
 Expand-Archive nodejs.zip -DestinationPath C:\; `
-Rename-Item "C:\\node-${NODE_VERSION}-win-x64" c:\nodejs
+Rename-Item "C:\\node-$Env:NODE_VERSION-win-x64" c:\nodejs
 
 FROM mcr.microsoft.com/windows/nanoserver:1803
 
