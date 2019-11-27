@@ -3,7 +3,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- debug
+- develop
 
 resources:
 - repo: self
@@ -18,7 +18,7 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'win1809'
     steps:
     - task: Docker@2
       displayName: Build an image
@@ -28,8 +28,8 @@ stages:
         command: 'build'
         Dockerfile: '**/Dockerfile-Windows'
         tags: |
-          debug-windows
-    - script: docker run --rm phillmac/orbit-db-http-api-dev:debug-windows --version
+          develop-windows
+    - script: docker run --rm phillmac/orbit-db-http-api-dev:develop-windows --version
     - task: Docker@2
       displayName: Push image
       inputs:
@@ -37,7 +37,7 @@ stages:
         repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          debug-windows
+          develop-windows
 
     # - task: TriggerBuild@3
     #   inputs:
