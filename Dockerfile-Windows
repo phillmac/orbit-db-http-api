@@ -7,7 +7,7 @@ ARG NODE_VERSION="v12.13.1"
 RUN powershell -NoProfile -Command " \ 
     Invoke-WebRequest -OutFile nodejs.zip -UseBasicParsing """https://nodejs.org/dist/$Env:NODE_VERSION/node-$Env:NODE_VERSION-win-x64.zip"""; \
     Expand-Archive nodejs.zip -DestinationPath C:\; \
-    Rename-Item """C:\\node-$Env:NODE_VERSION-win-x64""" c:\nodejs \
+    Rename-Item """C:\node-$Env:NODE_VERSION-win-x64""" c:\nodejs \
 "
 
 FROM mcr.microsoft.com/windows/nanoserver:1909
