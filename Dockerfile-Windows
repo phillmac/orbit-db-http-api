@@ -10,7 +10,7 @@ RUN powershell -NoProfile -Command " \
     Rename-Item """C:\node-$Env:NODE_VERSION-win-x64""" c:\nodejs \
 "
 
-FROM mcr.microsoft.com/windows/nanoserver:1909
+FROM mcr.microsoft.com/windows/nanoserver:1803
 
 WORKDIR /nodejs
 COPY --from=installer C:\nodejs\ .
