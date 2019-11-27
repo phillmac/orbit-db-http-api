@@ -1,0 +1,66 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- debug
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        containerRegistry: 'OrbitDB Docker Hub'
+        repository: 'phillmac/orbit-db-http-api-dev'
+        command: 'build'
+        Dockerfile: '**/Dockerfile-Windows'
+        tags: |
+          debug-windows
+    - script: docker run --rm phillmac/orbit-db-http-api-dev:debug-windows --version
+    - task: Docker@2
+      displayName: Push image
+      inputs:
+        containerRegistry: 'OrbitDB Docker Hub'
+        repository: 'phillmac/orbit-db-http-api-dev'
+        command: 'push'
+        tags: |
+          debug-windows
+
+    # - task: TriggerBuild@3
+    #   inputs:
+    #     definitionIsInCurrentTeamProject: false
+    #     tfsServer: 'https://phillmac.visualstudio.com'
+    #     teamProject: '804fe699-2025-46ad-b3c1-29bd8f6e974d'
+    #     buildDefinition: 'phillmac.orbit-db-http-api-tests'
+    #     queueBuildForUserThatTriggeredBuild: false
+    #     ignoreSslCertificateErrors: false
+    #     useSameSourceVersion: false
+    #     useSameBranch: false
+    #     branchToUse: 'master'
+    #     waitForQueuedBuildsToFinish: true
+    #     waitForQueuedBuildsToFinishRefreshTime: '30'
+    #     failTaskIfBuildsNotSuccessful: true
+    #     cancelBuildsIfAnyFails: false
+    #     treatPartiallySucceededBuildAsSuccessful: false
+    #     downloadBuildArtifacts: false
+    #     storeInEnvironmentVariable: false
+    #     authenticationMethod: 'Personal Access Token'
+    #     password: '$(PiplinesPAT)'
+    #     enableBuildInQueueCondition: false
+    #     dependentOnSuccessfulBuildCondition: false
+    #     dependentOnFailedBuildCondition: false
+    #     checkbuildsoncurrentbranch: false
+    #     failTaskIfConditionsAreNotFulfilled: false
