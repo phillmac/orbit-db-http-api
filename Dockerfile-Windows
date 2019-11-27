@@ -12,7 +12,7 @@ RUN powershell -NoProfile -Command " \
 
 FROM mcr.microsoft.com/windows/nanoserver:1909
 
-WORKDIR C:\nodejs
+WORKDIR /nodejs
 COPY --from=installer C:\nodejs\ .
 RUN SETX PATH C:\nodejs
 RUN npm config set registry https://registry.npmjs.org/
