@@ -1,0 +1,29 @@
+FROM mcr.microsoft.com/windows/servercore:ltsc2019 as installer
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';$ProgressPreference='silentlyContinue';"]
+
+ARG NODE_VERSION="v12.13.1"
+
+RUN Invoke-WebRequest -OutFile nodejs.zip -UseBasicParsing "https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-win-x64.zip"; `
+Expand-Archive nodejs.zip -DestinationPath C:\; `
+Rename-Item "C:\\node-${NODE_VERSION}-win-x64" c:\nodejs
+
+FROM mcr.microsoft.com/windows/nanoserver:1803
+
+WORKDIR C:\nodejs
+COPY --from=installer C:\nodejs\ .
+RUN SETX PATH C:\nodejs
+RUN npm config set registry https://registry.npmjs.org/
+
+WORKDIR /orbit-db-http-api
+
+# install and cache app dependencies
+COPY package.json /orbit-db-http-api/package.json
+
+RUN npm install
+
+# add app
+COPY . /app
+
+# start app
+ENTRYPOINT ["node", "src/cli.js"]
