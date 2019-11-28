@@ -14,7 +14,7 @@ FROM mcr.microsoft.com/windows/nanoserver:1809
 
 WORKDIR /nodejs
 COPY --from=installer /nodejs/ .
-RUN SETX PATH C:\nodejs
+ENV PATH="$WindowsPATH;C:\nodejs"
 RUN npm config set registry https://registry.npmjs.org/
 
 WORKDIR /orbit-db-http-api
