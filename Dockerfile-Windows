@@ -14,8 +14,13 @@ RUN powershell -NoProfile -Command " \
 
 FROM mcr.microsoft.com/windows/nanoserver:1809
 
-COPY --from=installer /nodejs /MinGit /
-ENV PATH="$WindowsPATH;C:\nodejs;C:\MinGit\cmd"
+WORKDIR /nodejs
+COPY --from=installer /nodejs/ .
+
+WORKDIR /MinGit
+COPY --from=installer /MinGit/ .
+
+ENV PATH="$WindowsPATH;C:\nodejs;C:\MinGit\cmd;"
 
 RUN npm config set registry https://registry.npmjs.org/
 
