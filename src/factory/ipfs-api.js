@@ -8,7 +8,7 @@ async function apiFactory (options) {
   const orbitDB = await OrbitDB.createInstance(ipfs, options.orbitDB)
   const managers = {}
   managers.peerManager = new PeerManager(ipfs, orbitDB, options)
-  managers.dbManager = new DBManager(orbitDB, managers.peerManager)
+  managers.dbManager = new DBManager(orbitDB, managers.peerManager, options)
   managers.sessionManager = new SessionManager()
   const orbitDBAPI = new OrbitDBApi(managers, options)
 
