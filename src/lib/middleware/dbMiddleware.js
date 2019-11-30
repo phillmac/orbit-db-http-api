@@ -1,4 +1,4 @@
-module.exports = function (dbMan) {
+module.exports = (dbMan) => {
   return fn =>
     async (request, h) => {
       const db = await dbMan.get(request.params.dbname)
