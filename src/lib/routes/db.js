@@ -79,20 +79,6 @@ module.exports = function (managers, options, logger) {
 
   return [
     {
-      method: 'GET',
-      path: '/dbs',
-      handler: (_request, _h) => dbMan.dbList()
-    },
-    {
-      method: ['POST', 'PUT'],
-      path: '/dbs/announce',
-      handler: (_request, _h) => {
-        peerMan.announceDBs()
-        return {}
-      }
-    },
-
-    {
       method: ['POST', 'PUT'],
       path: '/db',
       handler: async (request, _h) => {
@@ -255,11 +241,6 @@ module.exports = function (managers, options, logger) {
       method: 'GET',
       path: '/db/{dbname}/value',
       handler: dbMiddleware(async (db, _request, _h) => db.value)
-    },
-    {
-      method: 'GET',
-      path: '/identity',
-      handler: (_request, _h) => dbMan.identity()
     },
     {
       method: ['POST', 'PUT'],
