@@ -1,5 +1,6 @@
 module.exports = function (managers, options, logger) {
   const dbMan = managers.dbManager
+  const peerMan = managers.peerManager
 
   return [
     {
