@@ -6,7 +6,12 @@ module.exports = function (managers, _options, _logger) {
     {
       method: ['PUT', 'POST'],
       path: '/sessions/{sessionId}',
-      handler: (request, _h) => sessMan.addSession(request.params.sessionId)
+      handler: (request, _h) => sessMan.register(request.params.sessionId)
+    },
+    {
+      method: 'DELETE',
+      path: '/sessions/{sessionId}',
+      handler: (request, _h) => sessMan.unregister(request.params.sessionId)
     }
   ]
 }
