@@ -28,7 +28,7 @@
   "dependencies": {
     "docopt": "~0.6.2",
     "hapi": ">17.0.0",
-    "ipfs": "^0.40.0-rc.1",
+    "ipfs": "github:ipfs/js-ipfs",
     "ipfs-http-client": ">32.0.0",
     "lodash": "^4.17.12",
     "orbit-db": "github:orbitdb/orbit-db#feat/open-event",
