@@ -17,9 +17,9 @@ module.exports = function (managers, options, logger) {
       }
     },
     {
-        method: 'GET',
-        path: '/identity',
-        handler: (_request, _h) => dbMan.identity()
+      method: 'GET',
+      path: '/identity',
+      handler: (_request, _h) => dbMan.identity()
     }
   ]
 }

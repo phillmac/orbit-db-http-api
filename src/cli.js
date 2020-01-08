@@ -12,6 +12,7 @@ const PeerId = require('peer-id')
 const PeerInfo = require('peer-info')
 const multiaddr = require('multiaddr')
 const PeerBook = require('peer-book')
+const Web3 = require('web3')
 
 class Cli {
   constructor () {
@@ -123,7 +124,8 @@ async function init () {
         multiaddr,
         PeerBook,
         PeerId,
-        PeerInfo
+        PeerInfo,
+        Web3
       },
       cliOptions
     )
