@@ -185,10 +185,11 @@ module.exports = function (managers, options, logger) {
       handler: dbMiddleware(async (db, request, _h) => {
         logger.debug('Query reqest payload', request.payload)
         const qparams = request.payload
+        const comparison = comparisons[qparams.comp || 'all']
         if (process.env['DEBUG.QUERY']) {
           logger.debug(JSON.stringify(qparams, null, 2))
+          logger.debug(comparison, qparams.comp in comparisons)
         }
-        const comparison = comparisons[qparams.comp || 'all']
         const query = (doc) => comparison(doc[qparams.propname || '_id'], ...qparams.values)
         return db.query(query)
       })
