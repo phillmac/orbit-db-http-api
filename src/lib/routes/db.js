@@ -185,7 +185,7 @@ module.exports = function (managers, options, logger) {
       handler: dbMiddleware(async (db, request, _h) => {
         logger.debug('Query reqest payload', request.payload)
         const qparams = request.payload
-        if (process.env('DEBUG.QUERY')) {
+        if (process.env['DEBUG.QUERY']) {
           logger.debug(JSON.stringify(qparams, null, 2))
         }
         const comparison = comparisons[qparams.comp || 'all']
