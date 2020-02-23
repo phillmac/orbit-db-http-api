@@ -188,7 +188,10 @@ module.exports = function (managers, options, logger) {
         const comparison = comparisons[qparams.comp || 'all']
         if (process.env['DEBUG.QUERY']) {
           logger.debug(JSON.stringify(qparams, null, 2))
-          logger.debug(comparison, qparams.comp in comparisons)
+          logger.debug('Comp found: ', qparams.comp in comparisons)
+          if(comparison) {
+            logger.debug('Comp src:', comparison.toSource())
+          }
         }
         const query = (doc) => comparison(doc[qparams.propname || '_id'], ...qparams.values)
         return db.query(query)
