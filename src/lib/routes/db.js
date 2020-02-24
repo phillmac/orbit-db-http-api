@@ -189,7 +189,7 @@ module.exports = function (managers, options, logger) {
         if (process.env['DEBUG.QUERY']) {
           logger.debug(JSON.stringify(qparams, null, 2))
           logger.debug('Comp found: ', qparams.comp in comparisons)
-          if(comparison) {
+          if (comparison) {
             logger.debug('Comp src:', comparison.toSource())
           }
         }
