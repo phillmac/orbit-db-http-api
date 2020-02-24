@@ -186,7 +186,7 @@ module.exports = function (managers, options, logger) {
         logger.debug('Query reqest payload', request.payload)
         const qparams = request.payload
         const comparison = comparisons[qparams.comp || 'all']
-        if (process.env['DEBUG.QUERY']) {
+        if (process.env['DEBUG_QUERY']) {
           logger.debug(JSON.stringify(qparams, null, 2))
           logger.debug('Comp found: ', qparams.comp in comparisons)
           if (comparison) {
