@@ -33,6 +33,7 @@
     "lodash": "^4.17.12",
     "orbit-db": "github:orbitdb/orbit-db#feat/open-event",
     "orbit-db-managers": "github:phillmac/orbit-db-managers#develop",
+    "orbit-db-store": "github:phillmac/orbit-db-store",
     "susie": "^3.0.0",
     "web3": "^1.2.4"
   }
