@@ -34,6 +34,7 @@
     "orbit-db": "github:orbitdb/orbit-db#feat/open-event",
     "orbit-db-managers": "github:phillmac/orbit-db-managers#develop",
     "orbit-db-store": "github:phillmac/orbit-db-store",
+    "peer-book": "^0.9.2",
     "susie": "^3.0.0",
     "web3": "^1.2.4"
   }
