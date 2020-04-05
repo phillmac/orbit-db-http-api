@@ -20,6 +20,17 @@ module.exports = function (managers, options, logger) {
       method: 'GET',
       path: '/identity',
       handler: (_request, _h) => dbMan.identity()
+    },
+    {
+      method: 'GET',
+      path: '/pending',
+      handler: (_request, _h) => {
+        return {
+          open: dbMan.pendingOpens(),
+          ready: dbMan.pendingReady(),
+          load: dbMan.pendingLoad()
+        }
+      }
     }
   ]
 }
