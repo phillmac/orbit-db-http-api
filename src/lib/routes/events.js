@@ -6,11 +6,11 @@ module.exports = function (managers, options, _logger) {
   const addDBManEventListener = (eventName, request, h) => {
     const eventMap = new Map(Object.entries({
       open: (address) =>
-        h.event({ event: 'open', data: { address } }),
+        h.event({ event: 'orbitdb.open', data: { address } }),
       load: (address) =>
-        h.event({ event: 'load', data: { address } }),
+        h.event({ event: 'orbitdb.load', data: { address } }),
       ready: (address, heads) =>
-        h.event({ event: 'ready', data: { address, heads } })
+        h.event({ event: 'orbitdb.ready', data: { address, heads } })
     }))
 
     const eventCallback = eventMap.get(eventName)
