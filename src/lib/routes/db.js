@@ -99,7 +99,8 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}',
       handler: async (request, _h) => {
         const payload = request.payload
-        const db = dbMan.get(request.params.dbname)
+        let db
+        db = dbMan.get(request.params.dbname)
         if (db === null) {
           db = await dbMan.openCreate(request.params.dbname, payload)
         }
