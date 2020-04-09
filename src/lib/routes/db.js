@@ -15,9 +15,6 @@ const comparisons = {
 const rawIterator = (db, request, _h) =>
   db.iterator(request.payload).collect()
 
-const getRaw = (db, request, _h) =>
-  db.get(request.params.item)
-
 const unpackContents = (contents) => {
   if (contents) {
     if (contents.map) {
@@ -232,6 +229,10 @@ module.exports = function (managers, options, logger) {
           if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
           throw Boom.notFound('Item not found')
         }
+        if (typeof raw === 'string') {
+          h.header('Content-Type', 'application/json')
+          return JSON.stringify(raw)
+        }
         return raw
       })
     },
@@ -239,12 +240,17 @@ module.exports = function (managers, options, logger) {
       method: 'GET',
       path: '/db/{dbname}/{item}',
       handler: dbMiddleware(async (db, request, h) => {
-        const raw = await getRaw(db, request, h)
+        const raw = await db.get(request.params.item)
         if (typeof raw === 'undefined') {
           if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
           throw Boom.notFound('Item not found')
         }
-        return unpackContents(raw)
+        contents = unpackContents(raw)
+        if (typeof contents === 'string') {
+          h.header('Content-Type', 'application/json')
+          return JSON.stringify(contents)
+        }
+        return contents
       })
     },
     {
