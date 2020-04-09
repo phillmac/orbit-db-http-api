@@ -225,7 +225,7 @@ module.exports = function (managers, options, logger) {
       handler: dbMiddleware(async (db, request, h) => {
         const raw = getRaw(db, request, h)
         if(raw === null) throw Boom.notFound(`${request.params.item} not found`)
-        return JSON.stringify(unpackContents(raw))
+        return unpackContents(raw)
       })
     },
     {
