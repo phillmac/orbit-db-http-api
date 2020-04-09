@@ -5,11 +5,11 @@ module.exports = function (managers, options, _logger) {
 
   const addDBManEventListener = (eventName, request, h) => {
     const eventMap = new Map(Object.entries({
-      'open': (address) =>
+      open: (address) =>
         h.event({ event: 'open', data: { address } }),
-      'load': (address) =>
+      load: (address) =>
         h.event({ event: 'load', data: { address } }),
-      'ready': (address, heads) =>
+      ready: (address, heads) =>
         h.event({ event: 'ready', data: { address, heads } })
     }))
 

@@ -186,7 +186,7 @@ module.exports = function (managers, options, logger) {
         logger.debug('Query reqest payload', request.payload)
         const qparams = request.payload
         const comparison = comparisons[qparams.comp || 'all']
-        if (process.env['DEBUG_QUERY']) {
+        if (process.env.DEBUG_QUERY) {
           logger.debug(JSON.stringify(qparams, null, 2))
           logger.debug('Comp found: ', qparams.comp in comparisons)
           if (comparison) {
@@ -224,9 +224,9 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}/{item}',
       handler: dbMiddleware(async (db, request, h) => {
         const raw = getRaw(db, request, h)
-        if(raw === null) {
+        if (raw === null) {
           if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
-          throw Boom.notFound(`Item not found`)
+          throw Boom.notFound('Item not found')
         }
         return unpackContents(raw)
       })

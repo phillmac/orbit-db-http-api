@@ -172,10 +172,11 @@ async function init () {
 
     await orbitDBAPI.server.start()
     logger.info(`Server running on port ${options.server.hapi.port}`)
-    logger.debug({DEBUG: {
-      QUERY: process.env['DEBUG_QUERY']
-    }})
-
+    logger.debug({
+      DEBUG: {
+        QUERY: process.env.DEBUG_QUERY
+      }
+    })
   } catch (err) {
     logger.error(err)
     process.exit(1)
