@@ -226,14 +226,19 @@ module.exports = function (managers, options, logger) {
       method: 'GET',
       path: '/db/{dbname}/raw/{item}',
       handler: dbMiddleware(async (db, request, h) => {
-        return JSON.stringify(getRaw(db, request, h))
+        const raw = await getRaw(db, request, h)
+        if (raw === null) {
+          if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
+          throw Boom.notFound('Item not found')
+        }
+        return raw
       })
     },
     {
       method: 'GET',
       path: '/db/{dbname}/{item}',
       handler: dbMiddleware(async (db, request, h) => {
-        const raw = getRaw(db, request, h)
+        const raw = await getRaw(db, request, h)
         if (raw === null) {
           if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
           throw Boom.notFound('Item not found')
