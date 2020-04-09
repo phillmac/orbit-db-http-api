@@ -35,7 +35,7 @@ const unpackContents = (contents) => {
 module.exports = function (managers, options, logger) {
   const dbMan = managers.dbManager
   const peerMan = managers.peerManager
-  const dbMiddleware = require('../middleware/dbMiddleware.js')(dbMan)
+  const dbMiddleware = require('../middleware/dbMiddleware.js')(options.orbitDBAPI.apiDebug, dbMan)
 
   const addDBEventListener = (db, eventName, request, h) => {
     const eventMap = new Map(Object.entries({
