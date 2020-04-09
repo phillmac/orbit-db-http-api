@@ -85,7 +85,7 @@ module.exports = function (managers, options, logger) {
         const payload = request.payload
         let db
         db = dbMan.get(payload.dbname)
-        if (db === null){
+        if (db === null) {
           db = await dbMan.openCreate(payload.dbname, payload)
         }
         if (!db) { // TODO: add docs
@@ -99,7 +99,7 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}',
       handler: async (request, _h) => {
         const payload = request.payload
-        let  db = dbMan.get(request.params.dbname)
+        const db = dbMan.get(request.params.dbname)
         if (db === null) {
           await dbMan.openCreate(request.params.dbname, payload)
         }
