@@ -83,7 +83,7 @@ module.exports = function (managers, options, logger) {
       path: '/db',
       handler: async (request, _h) => {
         const payload = request.payload
-        const db = await dbMan.get(payload.dbname, payload)
+        const db = (dbMan.get(payload.dbname)) || (await dbMan.openCreate(payload.dbname, payload))
         return dbMan.dbInfo(db)
       }
     },
@@ -92,7 +92,7 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}',
       handler: async (request, _h) => {
         const payload = request.payload
-        const db = await dbMan.get(request.params.dbname, payload)
+        const db = (dbMan.get(request.params.dbname)) || (await dbMan.openCreate(request.params.dbname, payload))
         if (!db) { // TODO: add docs
           return {}
         }
@@ -224,6 +224,7 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}/{item}',
       handler: dbMiddleware(async (db, request, h) => {
         const raw = getRaw(db, request, h)
+        if(raw === null) throw Boom.notFound(`${request.params.item} not found`)
         return JSON.stringify(unpackContents(raw))
       })
     },
