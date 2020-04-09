@@ -230,8 +230,8 @@ module.exports = function (managers, options, logger) {
           throw Boom.notFound('Item not found')
         }
         if (typeof raw === 'string') {
-          h.header('Content-Type', 'application/json')
-          return JSON.stringify(raw)
+          return h.response(JSON.stringify(raw))
+            .type('application/json')
         }
         return raw
       })
@@ -245,10 +245,10 @@ module.exports = function (managers, options, logger) {
           if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
           throw Boom.notFound('Item not found')
         }
-        contents = unpackContents(raw)
+        const contents = unpackContents(raw)
         if (typeof contents === 'string') {
-          h.header('Content-Type', 'application/json')
-          return JSON.stringify(contents)
+          return h.response(JSON.stringify(contents))
+            .type('application/json')
         }
         return contents
       })
