@@ -101,7 +101,7 @@ module.exports = function (managers, options, logger) {
         const payload = request.payload
         const db = dbMan.get(request.params.dbname)
         if (db === null) {
-          await dbMan.openCreate(request.params.dbname, payload)
+          db = await dbMan.openCreate(request.params.dbname, payload)
         }
         if (!db) { // TODO: add docs
           return {}
