@@ -224,7 +224,10 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}/{item}',
       handler: dbMiddleware(async (db, request, h) => {
         const raw = getRaw(db, request, h)
-        if(raw === null) throw Boom.notFound(`${request.params.item} not found`)
+        if(raw === null) {
+          if (options.orbitDBAPI.apiDebug) throw Boom.notFound(`Item ${request.params.item} not found`)
+          throw Boom.notFound(`Item not found`)
+        }
         return unpackContents(raw)
       })
     },
