@@ -83,7 +83,14 @@ module.exports = function (managers, options, logger) {
       path: '/db',
       handler: async (request, _h) => {
         const payload = request.payload
-        const db = (dbMan.get(payload.dbname)) || (await dbMan.openCreate(payload.dbname, payload))
+        let db
+        db = dbMan.get(payload.dbname)
+        if (db === null){
+          db = await dbMan.openCreate(payload.dbname, payload)
+        }
+        if (!db) { // TODO: add docs
+          return {}
+        }
         return dbMan.dbInfo(db)
       }
     },
@@ -92,7 +99,10 @@ module.exports = function (managers, options, logger) {
       path: '/db/{dbname}',
       handler: async (request, _h) => {
         const payload = request.payload
-        const db = (dbMan.get(request.params.dbname)) || (await dbMan.openCreate(request.params.dbname, payload))
+        let  db = dbMan.get(request.params.dbname)
+        if (db === null) {
+          await dbMan.openCreate(request.params.dbname, payload)
+        }
         if (!db) { // TODO: add docs
           return {}
         }
