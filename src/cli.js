@@ -11,8 +11,9 @@ const merge = require('lodash/merge')
 const PeerId = require('peer-id')
 const PeerInfo = require('peer-info')
 const multiaddr = require('multiaddr')
-const PeerBook = require('peer-book')
+const PeerStore = require('libp2p/src/peer-store')
 const Web3 = require('web3')
+const {EventSource} = require('events')
 
 class Cli {
   constructor () {
@@ -122,10 +123,11 @@ async function init () {
     options = merge({}, options,
       {
         multiaddr,
-        PeerBook,
+        PeerStore,
         PeerId,
         PeerInfo,
-        Web3
+        Web3,
+        EventSource
       },
       cliOptions
     )
