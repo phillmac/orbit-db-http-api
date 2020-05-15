@@ -13,7 +13,7 @@ const PeerInfo = require('peer-info')
 const multiaddr = require('multiaddr')
 const PeerStore = require('libp2p/src/peer-store')
 const Web3 = require('web3')
-const {EventSource} = require('events')
+const { EventEmitter } = require('events')
 
 class Cli {
   constructor () {
@@ -127,7 +127,7 @@ async function init () {
         PeerId,
         PeerInfo,
         Web3,
-        EventSource
+        EventEmitter
       },
       cliOptions
     )
