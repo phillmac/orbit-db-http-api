@@ -1,8 +1,8 @@
 
-module.exports = function (managers, _options, _logger) {
+module.exports = function (managers, options, _logger) {
   const dbMan = managers.dbManager
   const peerMan = managers.peerManager
-  const dbMiddleware = require('../middleware/dbMiddleware.js')(dbMan)
+  const dbMiddleware = require('../middleware/dbMiddleware.js')(options.orbitDBAPI.apiDebug, dbMan)
 
   return [
     {
