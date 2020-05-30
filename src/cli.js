@@ -95,7 +95,7 @@ async function init () {
         apiDebug: Boolean(apiDebug),
         logger
       },
-      dbMan: {logger: Logger.create('orbit-db-dbMan')},
+      dbMan: { logger: Logger.create('orbit-db-dbMan') },
       peerMan: {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
