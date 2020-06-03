@@ -18,7 +18,7 @@ const deps = {
   Web3
 }
 
-const getManagers = async ({ ipfs, options }) => {
+const getManagers = async (ipfs, options) => {
   const orbitDB = await OrbitDB.createInstance(ipfs, options.orbitDB)
   const peerManager = new PeerManager({ ipfs, orbitDB, ...deps, options })
   return {
