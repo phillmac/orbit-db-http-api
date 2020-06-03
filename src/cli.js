@@ -8,13 +8,6 @@ const localApiFactory = require('./factory/ipfs-local.js')
 const remoteApiFactory = require('./factory/ipfs-api.js')
 const merge = require('lodash/merge')
 
-const PeerId = require('peer-id')
-const PeerInfo = require('peer-info')
-const multiaddr = require('multiaddr')
-const PeerStore = require('libp2p/src/peer-store')
-const Web3 = require('web3')
-const { EventEmitter } = require('events')
-
 class Cli {
   constructor () {
     const doc =
@@ -95,12 +88,10 @@ async function init () {
         apiDebug: Boolean(apiDebug),
         logger
       },
-      dbMan: { logger: Logger.create('orbit-db-dbMan') },
       peerMan: {
         dhtEnabled: Boolean(ipfsDHT),
         ipfsMode: ipfsMode,
-        announceDBs: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(announceDBs),
-        logger: Logger.create('orbit-db-peerMan')
+        announceDBs: (ipfsMode === 'api' || (ipfsMode === 'local' && ipfsDHT)) && Boolean(announceDBs)
       },
       server: {
         hapi: {
@@ -121,17 +112,7 @@ async function init () {
       delete cliOptions.ipfs.port
     }
 
-    options = merge({}, options,
-      {
-        multiaddr,
-        PeerStore,
-        PeerId,
-        PeerInfo,
-        Web3,
-        EventEmitter
-      },
-      cliOptions
-    )
+    options = merge({}, options, cliOptions)
 
     if ((enableTLS) && (!options.server.http2.certFile)) throw new Error('--https-cert is required')
     if ((enableTLS) && (!options.server.http2.certKeyFile)) throw new Error('--https-key is required')
