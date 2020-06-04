@@ -115,7 +115,10 @@ module.exports = function (managers, options, logger) {
     {
       method: ['POST', 'PUT'],
       path: '/db/{dbname}/load',
-      handler: dbMiddleware(async (db, request, _h) => dbMan.loadDB(db))
+      handler: dbMiddleware(async (db, request, _h) => {
+        dbMan.loadDB(db)
+        return {}
+      })
     },
     {
       method: ['POST', 'PUT'],
