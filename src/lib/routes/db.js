@@ -114,6 +114,11 @@ module.exports = function (managers, options, logger) {
     },
     {
       method: ['POST', 'PUT'],
+      path: '/db/{dbname}/load',
+      handler: dbMiddleware(async (db, request, _h) => dbMan.loadDB(db))
+    },
+    {
+      method: ['POST', 'PUT'],
       path: '/db/{dbname}/announce',
       handler: dbMiddleware(async (db, _request, _h) => {
         peerMan.announceDB(db)
