@@ -14,7 +14,8 @@
     "db"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update-managers": "npm update orbit-db-managers && git add package-lock.json && git commit -m 'Update orbit-db-managers version' && git push"
   },
   "author": "Phillip Mackintosh, Hayden Young",
   "license": "MIT",
