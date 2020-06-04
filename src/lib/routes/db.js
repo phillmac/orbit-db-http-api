@@ -122,6 +122,15 @@ module.exports = function (managers, options, logger) {
     },
     {
       method: ['POST', 'PUT'],
+      path: '/db/{dbname}/sync',
+      handler: dbMiddleware(async (db, request, _h) => {
+        const params = request.payload
+        dbMan.syncDB(db, params)
+        return {}
+      })
+    },
+    {
+      method: ['POST', 'PUT'],
       path: '/db/{dbname}/announce',
       handler: dbMiddleware(async (db, _request, _h) => {
         peerMan.announceDB(db)
