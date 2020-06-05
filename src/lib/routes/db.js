@@ -232,6 +232,22 @@ module.exports = function (managers, options, logger) {
     },
     {
       method: 'GET',
+      path: '/db/{dbname}/oplog/heads',
+      handler: dbMiddleware(async (db, request, h) => {
+        const oplog = db.oplog || db._oplog
+        return oplog.heads
+      })
+    },
+    {
+      method: 'GET',
+      path: '/db/{dbname}/oplog/values',
+      handler: dbMiddleware(async (db, request, h) => {
+        const oplog = db.oplog || db._oplog
+        return oplog.values
+      })
+    },
+    {
+      method: 'GET',
       path: '/db/{dbname}/rawiterator',
       handler: dbMiddleware(async (db, request, h) => {
         return rawIterator(db, request, h)
