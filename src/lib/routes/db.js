@@ -172,7 +172,11 @@ module.exports = function (managers, options, logger) {
         if (db.type === 'keyvalue') {
           let key, value
           if (!params.key) {
-            [key, value] = [Object.keys(params)[0], Object.values(params)[0]]
+            const keysList = Object.keys(params)
+            const valuesList = Object.values(params)
+            key = keysList[0]
+            value = valuesList[0]
+            logger.debug({ keysList, valuesList, key, value })
           } else {
             ({ key, value } = params)
           }

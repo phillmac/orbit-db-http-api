@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const pMap = require('p-map');
+const pMap = require('p-map')
 const PeerId = require('peer-id')
 const OrbitDB = require('orbit-db')
 const Logger = require('logplease')
