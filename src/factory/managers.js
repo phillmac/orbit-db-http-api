@@ -9,7 +9,7 @@ const { default: PQueue } = require('p-queue')
 const PeerStore = require('libp2p/src/peer-store')
 const { EventEmitter } = require('events')
 const { DBManager, PeerManager, SessionManager } = require('orbit-db-managers')
-const SetStore = require('orbit-db-set')
+const SetStore = require('@tabcat/orbit-db-set')
 
 OrbitDB.addDatabaseType(SetStore.type, SetStore)
 
