@@ -1,9 +1,9 @@
 # Docker
-# Build a Docker image 
+# Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- master
+- fix/update-deps
 
 resources:
 - repo: self
@@ -14,7 +14,7 @@ variables:
 stages:
 - stage: Build
   displayName: Build image
-  jobs:  
+  jobs:
   - job: Build
     displayName: Build
     pool:
@@ -24,18 +24,16 @@ stages:
       displayName: Build an image
       inputs:
         containerRegistry: 'OrbitDB Docker Hub'
-        repository: 'orbitdb/orbit-db-http-api'
+        repository: 'phillmac/orbit-db-http-api-dev'
         command: 'build'
         Dockerfile: '**/Dockerfile'
         tags: |
-          latest
-          $(tag)
+          fix/update-deps-v$(tag)
     - task: Docker@2
       displayName: Push image
       inputs:
         containerRegistry: 'OrbitDB Docker Hub'
-        repository: 'orbitdb/orbit-db-http-api'
+        repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          latest
-          $(tag)
+          fix/update-deps-v$(tag)
