@@ -28,7 +28,7 @@ stages:
         command: 'build'
         Dockerfile: '**/Dockerfile'
         tags: |
-          fix/update-deps-v$(tag)
+          fix.update-deps.v$(tag)
     - task: Docker@2
       displayName: Push image
       inputs:
@@ -36,4 +36,4 @@ stages:
         repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          fix/update-deps-v$(tag)
+          fix.update-deps.v$(tag)
