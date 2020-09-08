@@ -46,6 +46,7 @@ stages:
         queueBuildForUserThatTriggeredBuild: false
         ignoreSslCertificateErrors: false
         useSameSourceVersion: false
+        useCustomSourceVersion: false
         useSameBranch: false
         branchToUse: 'master'
         waitForQueuedBuildsToFinish: true
@@ -55,6 +56,7 @@ stages:
         treatPartiallySucceededBuildAsSuccessful: false
         downloadBuildArtifacts: false
         storeInEnvironmentVariable: false
+        buildParameters: 'API_Image_Branch:fix.update-deps.v$(tag)'
         authenticationMethod: 'Personal Access Token'
         password: '$(PiplinesPAT)'
         enableBuildInQueueCondition: false
