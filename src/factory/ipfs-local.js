@@ -13,12 +13,7 @@ async function apiFactory (options) {
       start: true
     }
   }, options)
-  const ipfs = await new Promise((resolve, reject) => {
-    var node = new Ipfs(options.ipfs)
-    node.on('ready', () => {
-      resolve(node)
-    })
-  }).catch((err) => { throw err })
+   const ipfs = await Ipfs.create(options.ipfs)
 
   const orbitDBAPI = new OrbitDBApi(await getManagers(ipfs, options), options)
 
