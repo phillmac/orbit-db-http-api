@@ -86,7 +86,7 @@ class DBManager {
                 write: __db_write,
                 type: db.type,
                 uid: db.uid,
-                indexLength: db.index.length || Object.keys(db.index).length,
+                indexLength: db.index ? (db.index.length || Object.keys(db.index).length) : -1,
                 accessControlerType: db.access.type || 'custom',
                 capabilities: Object.keys(                                         //TODO: cleanup this mess once tc39 object.fromEntries aproved
                     Object.assign ({}, ...                                         // https://tc39.github.io/proposal-object-from-entries
