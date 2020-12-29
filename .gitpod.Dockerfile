@@ -1,3 +1,3 @@
 FROM gitpod/workspace-full
 
-RUN make root-cert
+RUN mkdir -p /usr/local/share/ca-certificates/extra
