@@ -29,6 +29,7 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           debug
+          'debug-$(tag)'
     - script: docker run --rm phillmac/orbit-db-http-api-dev:debug src/cli.js --version
     - task: Docker@2
       displayName: Push image
@@ -37,7 +38,7 @@ stages:
         repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          debug
+          'debug-$(tag)'
     - task: TriggerBuild@3
       inputs:
         definitionIsInCurrentTeamProject: false
@@ -47,6 +48,7 @@ stages:
         queueBuildForUserThatTriggeredBuild: false
         ignoreSslCertificateErrors: false
         useSameSourceVersion: false
+        useCustomSourceVersion: false
         useSameBranch: false
         branchToUse: 'master'
         waitForQueuedBuildsToFinish: true
@@ -56,6 +58,7 @@ stages:
         treatPartiallySucceededBuildAsSuccessful: false
         downloadBuildArtifacts: false
         storeInEnvironmentVariable: false
+        buildParameters: 'API_Image_Branch: debug-$(tag)'
         authenticationMethod: 'Personal Access Token'
         password: '$(PiplinesPAT)'
         enableBuildInQueueCondition: false
@@ -63,3 +66,11 @@ stages:
         dependentOnFailedBuildCondition: false
         checkbuildsoncurrentbranch: false
         failTaskIfConditionsAreNotFulfilled: false
+    - task: Docker@2
+      displayName: Push image
+      inputs:
+        containerRegistry: 'OrbitDB Docker Hub'
+        repository: 'phillmac/orbit-db-http-api-dev'
+        command: 'push'
+        tags: |
+          debug
