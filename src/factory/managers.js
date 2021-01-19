@@ -5,7 +5,6 @@ const OrbitDB = require('orbit-db')
 const Logger = require('logplease')
 const multiaddr = require('multiaddr')
 const { default: PQueue } = require('p-queue')
-const PeerStore = require('libp2p/src/peer-store')
 const { EventEmitter } = require('events')
 const { DBManager, PeerManager, SessionManager } = require('orbit-db-managers')
 const SetStore = require('@tabcat/orbit-db-set')
@@ -17,15 +16,14 @@ const deps = {
   Logger,
   multiaddr,
   PeerId,
-  PeerStore,
   pMap,
   PQueue,
   Web3
 }
 
-const getManagers = async (ipfs, options) => {
+const getManagers = async (ipfs, peerStore, options) => {
   const orbitDB = await OrbitDB.createInstance(ipfs, options.orbitDB)
-  const peerManager = new PeerManager({ ipfs, orbitDB, ...deps, options })
+  const peerManager = new PeerManager({ ipfs, orbitDB, peerStore, ...deps, options })
   return {
     peerManager,
     dbManager: new DBManager({ orbitDB, peerManager, ...deps, options }),

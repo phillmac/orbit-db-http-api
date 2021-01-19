@@ -13,9 +13,9 @@ async function apiFactory (options) {
       start: true
     }
   }, options)
-   const ipfs = await Ipfs.create(options.ipfs)
-
-  const orbitDBAPI = new OrbitDBApi(await getManagers(ipfs, options), options)
+  const ipfs = await Ipfs.create(options.ipfs)
+  const peerStore = ipfs.libp2p.peerStore
+  const orbitDBAPI = new OrbitDBApi(await getManagers(ipfs, peerStore, options), options)
 
   return orbitDBAPI
 }
