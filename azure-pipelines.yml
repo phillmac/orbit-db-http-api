@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  tag: 'debug_v$(Build.BuildId)'
+  tag: 'debug-b$(Build.BuildId)'
 
 stages:
 - stage: Build
@@ -29,7 +29,7 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           debug
-          '$(tag)'
+          $(tag)
     - script: docker run --rm phillmac/orbit-db-http-api-dev:debug src/cli.js --version
     - task: Docker@2
       displayName: Push image
@@ -38,7 +38,7 @@ stages:
         repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          '$(tag)'
+          $(tag)
     - task: TriggerBuild@3
       inputs:
         definitionIsInCurrentTeamProject: false
