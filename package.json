@@ -35,6 +35,7 @@
     "ipfs-http-client": "^47.0.1",
     "lodash": "^4.17.12",
     "orbit-db": "github:phillmac/orbit-db",
+    "orbit-db-keystore": "^0.3.5",
     "orbit-db-managers": "github:phillmac/orbit-db-managers#develop",
     "susie": "^3.0.0",
     "web3": "^1.3.1"
