@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  tag: 'debug_v$(Build.BuildId)'
 
 stages:
 - stage: Build
@@ -29,7 +29,7 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           debug
-          'debug.$(tag)'
+          '$(tag)'
     - script: docker run --rm phillmac/orbit-db-http-api-dev:debug src/cli.js --version
     - task: Docker@2
       displayName: Push image
@@ -38,7 +38,7 @@ stages:
         repository: 'phillmac/orbit-db-http-api-dev'
         command: 'push'
         tags: |
-          'debug.$(tag)'
+          '$(tag)'
     - task: TriggerBuild@3
       inputs:
         definitionIsInCurrentTeamProject: false
@@ -58,7 +58,7 @@ stages:
         treatPartiallySucceededBuildAsSuccessful: false
         downloadBuildArtifacts: false
         storeInEnvironmentVariable: false
-        buildParameters: 'API_Image_Branch: debug.$(tag)'
+        buildParameters: 'API_Image_Branch: $(tag)'
         authenticationMethod: 'Personal Access Token'
         password: '$(PiplinesPAT)'
         enableBuildInQueueCondition: false
