@@ -69,7 +69,7 @@ async function init () {
     const ipfsDHT = args['--ipfs-dht'] || process.env.IPFS_DHT
     const apiDebug = args['--debug'] || process.env.API_DEBUG
     const announceDBs = args['--announce-dbs'] || process.env.ANNOUNCE_DBS
-    const enablePing = args['--enable-ping '] || process.env.ENABLE_PING
+    const enablePing = args['--enable-ping'] || process.env.ENABLE_PING
 
     const cliOptions = {
       ipfs: {
